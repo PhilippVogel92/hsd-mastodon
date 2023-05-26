@@ -18,8 +18,5 @@ deploy:
   only:
     - main
   script:
-    - ssh $MASTODON_USER@$MASTODON_HOST
-    - systemctl stop mastodon-web mastodon-sidekiq mastodon-streaming
-    - sudo -iu mastodon bash -c /home/mastodon/scripts/update_live_server.sh
-    - systemctl start mastodon-web mastodon-sidekiq mastodon-streaming
+    - ssh $MASTODON_USER@$MASTODON_HOST '/root/scripts/update_mastodon.sh'
 

@@ -1,0 +1,25 @@
+image: ubuntu
+
+stages:
+  - deploy
+
+before_script:
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - ssh-keyscan $MASTODON_HOST >> ~/.ssh/known_hosts
+  - chmod 644 ~/.ssh/known_hosts
+
+deploy:
+  stage: deploy
+  environment: production
+  only:
+    - main
+  script:
+    - ssh $MASTODON_USER@$MASTODON_HOST
+    - systemctl stop mastodon-web mastodon-sidekiq mastodon-streaming
+    - sudo -iu mastodon bash -c /home/mastodon/scripts/update_live_server.sh
+    - systemctl start mastodon-web mastodon-sidekiq mastodon-streaming
+

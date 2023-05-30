@@ -83,6 +83,9 @@ for warning in all_warnings:
     # Combine both the headline and the description into a string to post on Mastodon
     headline = warning_details["info"][0]["headline"]
     event = warning_details["info"][0].get("event", "WARNUNG").upper()
+    # If the value in the "event" field does not make sense, we want to substitute it with a generic warning
+    if len(event) < 4 or event.isnumeric():
+        event = "WARNUNG"
     description = html.unescape(warning_details["info"][0]["description"]).replace("<br/>", "\n")
     if warning_details["msgType"] == "Cancel":
         warning_text = "✅ Entwarnung ✅\n{}\n\n{}".format(headline, description)

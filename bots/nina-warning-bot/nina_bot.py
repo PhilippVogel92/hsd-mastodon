@@ -61,7 +61,7 @@ all_warnings = make_request("/dashboard/" + REGION_CODE + ".json")
 # Get all warning IDs that were posted already
 try:
     with open(BLACKLIST_FILE, "r") as f:
-        warnings_already_posted = f.readlines()
+        warnings_already_posted = f.read().splitlines()
 except FileNotFoundError:
     warnings_already_posted = []
 
@@ -106,3 +106,4 @@ for warning in all_warnings:
 if warnings_posted_now:
     with open(BLACKLIST_FILE, "a+") as f:
         f.write('\n'.join(warnings_posted_now))
+        f.write('\n')

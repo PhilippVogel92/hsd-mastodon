@@ -84,7 +84,10 @@ for warning in all_warnings:
     headline = warning_details["info"][0]["headline"]
     event = warning_details["info"][0].get("event", "WARNUNG").upper()
     description = html.unescape(warning_details["info"][0]["description"]).replace("<br/>", "\n")
-    warning_text = "⚠️ {} ⚠️\n{}\n\n{}".format(event, headline, description)
+    if warning_details["msgType"] == "Cancel":
+        warning_text = "✅ Entwarnung ✅\n{}\n\n{}".format(headline, description)
+    else:
+        warning_text = "⚠️ {} ⚠️\n{}\n\n{}".format(event, headline, description)
 
     # Mastodon allows up to 500 characters. If our text exceeds this limit, it will be cut.
     if len(warning_text) > 500:

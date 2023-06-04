@@ -15,12 +15,11 @@ def get_Image(api_url, filename):
 
 
 
-
 if __name__ == "__main__":
 	# Setup mastodon connection:
 	mastodon = Mastodon(
     	access_token = 'sJYGYFq7-cDBW9p06QM_9UuPTAnpAQQlG_zLnZWCyiA',
-   		api_base_url = 'http://mastodon.hosting.medien.hs-duesseldorf/'
+   		api_base_url = 'http://mastodon.hosting.medien.hs-duesseldorf.de/'
 	)
 
 	get_Image(api_url, "weather.png")

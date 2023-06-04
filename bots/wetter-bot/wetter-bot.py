@@ -20,7 +20,7 @@ if __name__ == "__main__":
 	# Setup mastodon connection:
 	mastodon = Mastodon(
     	access_token = 'sJYGYFq7-cDBW9p06QM_9UuPTAnpAQQlG_zLnZWCyiA',
-   		api_base_url = 'https://mastodon.hosting.medien.hs-duesseldorf/'
+   		api_base_url = 'http://mastodon.hosting.medien.hs-duesseldorf/'
 	)
 
 	get_Image(api_url, "weather.png")

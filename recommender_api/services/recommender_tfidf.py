@@ -13,11 +13,9 @@ def load_test_data(filename, path):
     
     return data
 
-
-def recommend_with_tfidf(sentence, number_of_recommendations=10):
+def recommend_tfidf(sentence, number_of_recommendations=1000):
     
     test_toot_df = load_test_data("mastodon.social_toots.csv", "scraper/datasets")
-    
     tfidf_vectorizer = TfidfVectorizer()
 
     # Generate the tf-idf vectors for the corpus

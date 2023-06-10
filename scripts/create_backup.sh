@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # This script creates an encrypted, compressed and deduplicated backup
 # of the Mastodon instance, including the PostgreSQL database, Redis

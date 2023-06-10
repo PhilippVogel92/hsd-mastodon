@@ -14,6 +14,6 @@
 # Stop Mastodon services
 systemctl stop mastodon-web mastodon-sidekiq mastodon-streaming
 # Update Mastodon using a script that will be run as the mastodon user
-sudo -iu mastodon bash -c /home/mastodon/live/scripts/update_live_server.sh
+sudo -iu mastodon bash -c "cd ~mastodon/live/scripts && ./update_live_server.sh"
 # Start Mastodon services
 systemctl start mastodon-web mastodon-sidekiq mastodon-streaming

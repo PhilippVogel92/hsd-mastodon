@@ -28,7 +28,7 @@ function createProgressBarSVG(percentage) {
       rx: progressBarRadius,
       ry: progressBarRadius,
       x: padding,
-      y: svgHeight / 2 - progressBarHeight / 2,
+      y: svgHeight / 2,
     });
 
   // Progress rectangle
@@ -37,8 +37,20 @@ function createProgressBarSVG(percentage) {
     rx: progressBarRadius,
     ry: progressBarRadius,
     x: padding,
-    y: svgHeight / 2 - progressBarHeight / 2,
+    y: svgHeight / 2,
   });
+
+  // Text label
+  const textLabel = svg
+    .text(`${percentage}%`)
+    .font({ size: 30 })
+    .attr({
+      fill: hsdRed,
+      'font-weight': 'bold',
+      x: svgWidth / 2,
+      y: svgHeight / 2 - progressBarHeight / 2,
+      'text-anchor': 'middle',
+    });
 
   fs.writeFileSync("progressbar.svg", svg.svg());
 }

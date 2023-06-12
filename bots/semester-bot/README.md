@@ -9,8 +9,8 @@ script (`bot.js`).
 The following parameters must be set:
 | Name | Description | Example |
 | ---- | ----------- | ------- |
-| `MASTODON_API_BASE_URL` | The URL to the Mastodon instance. | https://mastodon.hosting.medien.hs-duesseldorf.de/ |
-| `MASTODON_API_ACCESS_TOKEN` | The access token to authenticate with the Mastodon API. | ... |
+| `BOT_API_URL` | The URL to the Mastodon instance. | https://mastodon.hosting.medien.hs-duesseldorf.de/ |
+| `ACCESS_TOKEN` | The access token to authenticate with the Mastodon API. | ... |
 | `SEMESTER_XML_ENDPOINT` | The endpoint for the semester information. | https://medien.hs-duesseldorf.de/studium/_api/Web/Lists(guid'c8932ccb-dbee-478f-a615-0e2e3f17304d')/Items |
 
 ## Usage

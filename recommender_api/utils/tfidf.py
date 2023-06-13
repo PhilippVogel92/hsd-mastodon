@@ -1,12 +1,12 @@
 import pandas as pd
 import os
-from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.metrics.pairwise import linear_kernel
 from sklearn.feature_extraction.text import TfidfVectorizer
 import json
 import requests
 from functools import reduce
 import html2text
+from .preprocessing import sentence_preprocessing
 
 def load_test_data(filename, path):
     data = pd.read_csv(os.path.join(path, filename), sep=";")
@@ -73,25 +73,34 @@ def recommend_with_tfidf_by_multiple(sentences, number_of_recommendations=10):
     sim_scores = sorted(sentences_with_cosine_similarity, key=lambda x: x['cosine_sim'], reverse=True)
     return sim_scores[:number_of_recommendations]
 
-def get_local_recommendations_with_tfidf(account_toots, followed_toots, number_of_recommendations=10):
+def get_local_recommendations_with_tfidf(account_toots, followed_toots, result_set, number_of_recommendations=10):
     tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=1)
     # Generate the tf-idf vectors for the corpus
     tfidf_matrix = tfidf_vectorizer.fit_transform(followed_toots)
     sentences_with_cosine_similarity = []
-    
     for sentence in account_toots:
         sentence_vector = tfidf_vectorizer.transform([sentence])
         cosine_sim_sentence = linear_kernel(sentence_vector, tfidf_matrix).flatten()
-        #sim_scores = list(enumerate(cosine_sim_sentence)) 
+        #show_scores(sentence, followed_toots, cosine_sim_sentence)
+
         for index, cosine_sim in enumerate(cosine_sim_sentence):
             if len(sentences_with_cosine_similarity) < index + 1:
-                sentences_with_cosine_similarity.append({'sentence': followed_toots[index], 'cosine_sim': cosine_sim})
+                sentences_with_cosine_similarity.append({'sentence': result_set[index], 'preprocessed_sentence': followed_toots[index], 'cosine_sim': cosine_sim})
             else:
                 sentences_with_cosine_similarity[index]['cosine_sim'] += cosine_sim
 
-
     sim_scores = sorted(sentences_with_cosine_similarity, key=lambda x: x['cosine_sim'], reverse=True)
     return sim_scores[:number_of_recommendations]
+
+def show_scores(sentence, followed_toots, cosine_sim_sentence):
+    df = pd.DataFrame(cosine_sim_sentence)
+    mask = df[0] > 0
+    df = df[mask]
+    print("----")
+    print(sentence)
+    for index in df.index:
+        print("sentence matched: ", followed_toots[index], ", cosine_sim: ", cosine_sim_sentence[index])
+    print("----")
 
 def get_account_id(data):
     json_string = data.account.split(", \'display_name\'")[0] + "}";
@@ -121,11 +130,11 @@ def get_followed_accounts(account_id):
 def recommend_with_tfidf_for_account(account_id, number_of_recommendations=10):
     # get toots of user
     account_toots = get_account_toots(account_id)
+    preprocesses_account_toots = [sentence_preprocessing(sentence) for sentence in account_toots]
     # get accounts followed by the user and collect relevant toots
     followed_accounts = get_followed_accounts(account_id)
     followed_toots = [get_account_toots(account_id) for account_id in followed_accounts]
     followed_toots = reduce(lambda x, y: x+y, followed_toots) 
-    recommendations = get_local_recommendations_with_tfidf(account_toots, followed_toots, number_of_recommendations)
+    preprocessed_followed_toots = [sentence_preprocessing(sentence) for sentence in followed_toots]
+    recommendations = get_local_recommendations_with_tfidf(preprocesses_account_toots, preprocessed_followed_toots, followed_toots, number_of_recommendations)
     return recommendations
-
-recommend_with_tfidf_for_account(110433998616673752)

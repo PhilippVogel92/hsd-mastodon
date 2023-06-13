@@ -48,30 +48,13 @@ def recommend_with_tfidf(sentence, number_of_recommendations=10):
     list_of_content = content.iloc[sim_indices]
     return list_of_content.tolist()
 
-def recommend_with_tfidf_by_multiple(sentences, number_of_recommendations=10):
-    
-    test_toot_df = load_test_data("mastodon.social_toots.csv", "scraper/datasets")
-    
-    tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=1)
+def normalize(scored_sentences):
+    max_score = scored_sentences[0]['cosine_sim']
+    min_score = scored_sentences[-1]['cosine_sim']
+    for index, entry in enumerate(scored_sentences):
+        scored_sentences[index]["cosine_sim"] = (entry["cosine_sim"] - min_score) / (max_score - min_score)
+    return scored_sentences
 
-    # Generate the tf-idf vectors for the corpus
-    content = test_toot_df['content'].apply(lambda x: html2text.html2text(x))
-    tfidf_matrix = tfidf_vectorizer.fit_transform(content)
-
-    sentences_with_cosine_similarity = []
-    for sentence in sentences:
-        sentence_vector = tfidf_vectorizer.transform([sentence])
-        cosine_sim_sentence = linear_kernel(sentence_vector, tfidf_matrix).flatten()
-        #sim_scores = list(enumerate(cosine_sim_sentence)) 
-        for index, cosine_sim in enumerate(cosine_sim_sentence):
-            if len(sentences_with_cosine_similarity) < index + 1:
-                sentences_with_cosine_similarity.append({'sentence': content.iloc[index], 'cosine_sim': cosine_sim})
-            else:
-                sentences_with_cosine_similarity[index]['cosine_sim'] += cosine_sim
-
-
-    sim_scores = sorted(sentences_with_cosine_similarity, key=lambda x: x['cosine_sim'], reverse=True)
-    return sim_scores[:number_of_recommendations]
 
 def get_local_recommendations_with_tfidf(account_toots, followed_toots, result_set, number_of_recommendations=10):
     tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=1)
@@ -90,7 +73,8 @@ def get_local_recommendations_with_tfidf(account_toots, followed_toots, result_s
                 sentences_with_cosine_similarity[index]['cosine_sim'] += cosine_sim
 
     sim_scores = sorted(sentences_with_cosine_similarity, key=lambda x: x['cosine_sim'], reverse=True)
-    return sim_scores[:number_of_recommendations]
+    normalized_scores = normalize(sim_scores)
+    return normalized_scores[:number_of_recommendations]
 
 def show_scores(sentence, followed_toots, cosine_sim_sentence):
     df = pd.DataFrame(cosine_sim_sentence)

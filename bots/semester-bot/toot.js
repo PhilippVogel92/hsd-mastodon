@@ -11,11 +11,12 @@ async function postToot(message, image) {
       api_url: process.env.BOT_API_URL,
     });
 
-    M.post("media", { file: fs.createReadStream(image) }).then((resp) => {
-      const id = resp.data.id;
-      console.log(id);
-      M.post("statuses", { status: message, media_ids: [id] });
-    });
+    setTimeout(() => {
+      M.post("media", { file: fs.createReadStream(image) }).then((resp) => {
+        const id = resp.data.id;
+        M.post("statuses", { status: message, media_ids: [id] });
+      });
+    }, 100);
   } catch (error) {
     console.error("Error:", error);
   }

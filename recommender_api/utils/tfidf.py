@@ -5,7 +5,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import json
 import requests
 from functools import reduce
-import html2text
 from .preprocessing import sentence_preprocessing
 
 def load_test_data(filename, path):
@@ -101,15 +100,15 @@ def get_account_toots(account_id):
     response = requests.get(url = f"https://{instance}/{path}")
     
     df = pd.DataFrame(data=response.json())
-    return df['content'].apply(lambda x: html2text.html2text(x)).to_list() if len(df) > 0 else []
+    return df['content'].to_list() if len(df) > 0 else []
 
 def get_followed_accounts(account_id):
     instance = "mastodon.hosting.medien.hs-duesseldorf.de"
     path = f"api/v1/accounts/{account_id}/following"
     response = requests.get(url = f"https://{instance}/{path}")
     
-    df = pd.DataFrame(data=response.json()).id.to_list()
-    return df
+    account_ids = pd.DataFrame(data=response.json()).id.to_list()
+    return account_ids
 
 def recommend_with_tfidf_for_account(account_id, number_of_recommendations=10):
     # get toots of user

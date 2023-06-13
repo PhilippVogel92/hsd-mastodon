@@ -1,6 +1,6 @@
 import spacy
 import re
-
+import html2text
 #nlp = spacy.load("en_core_web_lg")
 nlp = spacy.load("de_core_news_lg")
 
@@ -27,7 +27,11 @@ def lemmatize_text(sentence):
 def lower_words(sentence):
     return sentence.lower()
 
+def remove_html_tags(sentence):
+    return html2text.html2text(sentence)
+
 def sentence_preprocessing(sentence):
+    sentence = remove_html_tags(sentence)
     sentence = remove_newlines_in_text(sentence)
     sentence = remove_tag_urls(sentence)
     sentence = lower_words(sentence)

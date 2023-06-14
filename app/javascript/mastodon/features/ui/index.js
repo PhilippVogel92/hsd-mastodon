@@ -32,6 +32,7 @@ import {
   AccountTimeline,
   AccountGallery,
   HomeTimeline,
+  ForYouTimeline,
   Followers,
   Following,
   Reblogs,
@@ -181,6 +182,7 @@ class SwitchingColumnsArea extends React.PureComponent {
           <WrappedRoute path='/privacy-policy' component={PrivacyPolicy} content={children} />
 
           <WrappedRoute path={['/home', '/timelines/home']} component={HomeTimeline} content={children} />
+          <WrappedRoute path={['/for_you', '/timelines/for_you']} component={ForYouTimeline} content={children} />
           <WrappedRoute path={['/public', '/timelines/public']} exact component={PublicTimeline} content={children} />
           <WrappedRoute path={['/public/local', '/timelines/public/local']} exact component={CommunityTimeline} content={children} />
           <WrappedRoute path={['/conversations', '/timelines/direct']} component={DirectTimeline} content={children} />

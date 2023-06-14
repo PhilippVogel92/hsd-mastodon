@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     /getting-started
     /keyboard-shortcuts
     /home
+    /for_you
     /public
     /public/local
     /conversations
@@ -468,6 +469,7 @@ Rails.application.routes.draw do
 
       namespace :timelines do
         resource :home, only: :show, controller: :home
+        resource :for_you, only: :show, controller: :for_you
         resource :public, only: :show, controller: :public
         resources :tag, only: :show
         resources :list, only: :show

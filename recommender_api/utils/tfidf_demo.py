@@ -1,11 +1,33 @@
-import pandas as pd
-import os
-from sklearn.metrics.pairwise import linear_kernel
-from sklearn.feature_extraction.text import TfidfVectorizer
+import atexit
 import json
-import requests
+import os
 from functools import reduce
+
+import pandas as pd
+import psycopg2
+from dotenv import load_dotenv
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import linear_kernel
+
 from .preprocessing import sentence_preprocessing
+
+# Load database connection parameters
+load_dotenv()
+
+# Connect to the database
+conn = psycopg2.connect(host=os.getenv("DB_HOST"), port=os.getenv("DB_PORT"), dbname=os.getenv("DB_NAME"),
+                        user=os.getenv("DB_USER"), password=os.getenv("DB_PASS"))
+
+
+def cleanup():
+    """
+    Close the database connection when the program is terminated.
+    """
+    conn.close()
+
+
+# Register the cleanup function to be called when the program is terminated
+atexit.register(cleanup)
 
 
 def load_test_data(filename, path):
@@ -111,26 +133,36 @@ def get_account_id(data):
     json_string = json_string.replace("False", "false")
     json_string = json_string.replace("True", "true")
     json_object = json.loads(json_string)
-    data = data.drop("account")
+    data.drop("account")
     return json_object["id"]
 
 
 def get_account_toots(account_id):
-    instance = "mastodon.hosting.medien.hs-duesseldorf.de"
-    path = f"api/v1/accounts/{account_id}/statuses/"
-    response = requests.get(url=f"https://{instance}/{path}")
+    """
+    Get all toots of an account.
 
-    df = pd.DataFrame(data=response.json())
-    return df["content"].to_list() if len(df) > 0 else []
+    :param account_id: The id of the account.
+    :return: A list of toots.
+    """
+    cur = conn.cursor()
+    cur.execute("SELECT text FROM statuses WHERE account_id = %s;", (account_id,))
+    toots = cur.fetchall()
+    cur.close()
+    return [toot[0] for toot in toots]
 
 
 def get_followed_accounts(account_id):
-    instance = "mastodon.hosting.medien.hs-duesseldorf.de"
-    path = f"api/v1/accounts/{account_id}/following"
-    response = requests.get(url=f"https://{instance}/{path}")
+    """
+    Get all accounts followed by an account.
 
-    account_ids = pd.DataFrame(data=response.json()).id.to_list()
-    return account_ids
+    :param account_id: The id of the account.
+    :return: A list of account ids.
+    """
+    cur = conn.cursor()
+    cur.execute("SELECT target_account_id FROM follows WHERE account_id = %s;", (account_id,))
+    follows = cur.fetchall()
+    cur.close()
+    return [follow[0] for follow in follows]
 
 
 def recommend_with_tfidf_for_account(account_id, number_of_recommendations=10):

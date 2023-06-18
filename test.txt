@@ -1,0 +1,27 @@
+Started GET "/start" for 192.168.42.1 at 2023-06-11 11:20:28 +0000
+Chewy request strategy is `mastodon`
+  [1m[35m (1.7ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Cache read: blocked_ips
+Cache generate: blocked_ips
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "ip_blocks"."ip" FROM "ip_blocks" WHERE "ip_blocks"."severity" = $1[0m  [["severity", 9999]]
+Cache write: blocked_ips
+Processing by HomeController#index as HTML
+  [1m[36mUser Load (0.7ms)[0m  [1m[34mSELECT "users"."id", "users"."email", "users"."created_at", "users"."updated_at", "users"."encrypted_password", "users"."reset_password_token", "users"."reset_password_sent_at", "users"."sign_in_count", "users"."current_sign_in_at", "users"."last_sign_in_at", "users"."admin", "users"."confirmation_token", "users"."confirmed_at", "users"."confirmation_sent_at", "users"."unconfirmed_email", "users"."locale", "users"."encrypted_otp_secret", "users"."encrypted_otp_secret_iv", "users"."encrypted_otp_secret_salt", "users"."consumed_timestep", "users"."otp_required_for_login", "users"."last_emailed_at", "users"."otp_backup_codes", "users"."account_id", "users"."disabled", "users"."moderator", "users"."invite_id", "users"."chosen_languages", "users"."created_by_application_id", "users"."approved", "users"."sign_in_token", "users"."sign_in_token_sent_at", "users"."webauthn_id", "users"."sign_up_ip", "users"."role_id" FROM "users" WHERE "users"."id" = $1 ORDER BY "users"."id" ASC LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[36mAccount Load (0.9ms)[0m  [1m[34mSELECT "accounts"."id", "accounts"."username", "accounts"."domain", "accounts"."private_key", "accounts"."public_key", "accounts"."created_at", "accounts"."updated_at", "accounts"."note", "accounts"."display_name", "accounts"."uri", "accounts"."url", "accounts"."avatar_file_name", "accounts"."avatar_content_type", "accounts"."avatar_file_size", "accounts"."avatar_updated_at", "accounts"."header_file_name", "accounts"."header_content_type", "accounts"."header_file_size", "accounts"."header_updated_at", "accounts"."avatar_remote_url", "accounts"."locked", "accounts"."header_remote_url", "accounts"."last_webfingered_at", "accounts"."inbox_url", "accounts"."outbox_url", "accounts"."shared_inbox_url", "accounts"."followers_url", "accounts"."protocol", "accounts"."memorial", "accounts"."moved_to_account_id", "accounts"."featured_collection_url", "accounts"."fields", "accounts"."actor_type", "accounts"."discoverable", "accounts"."also_known_as", "accounts"."silenced_at", "accounts"."suspended_at", "accounts"."hide_collections", "accounts"."avatar_storage_schema_version", "accounts"."header_storage_schema_version", "accounts"."devices_url", "accounts"."suspension_origin", "accounts"."sensitized_at", "accounts"."trendable", "accounts"."reviewed_at", "accounts"."requested_review_at" FROM "accounts" WHERE "accounts"."id" = $1 LIMIT $2[0m  [["id", 110519801900351104], ["LIMIT", 1]]
+  [1m[36mSessionActivation Load (0.9ms)[0m  [1m[34mSELECT "session_activations".* FROM "session_activations" WHERE "session_activations"."user_id" = $1 AND "session_activations"."session_id" = $2 LIMIT $3[0m  [["user_id", 1], ["session_id", "bc615421d60a63a12c86216992d8b71a"], ["LIMIT", 1]]
+  [1m[36mSessionActivation Load (0.3ms)[0m  [1m[34mSELECT "session_activations".* FROM "session_activations" WHERE "session_activations"."session_id" = $1 LIMIT $2[0m  [["session_id", "bc615421d60a63a12c86216992d8b71a"], ["LIMIT", 1]]
+  Rendering layout layouts/application.html.haml
+  Rendering home/index.html.haml within layouts/application
+Cache read: site_uploads/thumbnail
+Cache generate: site_uploads/thumbnail
+  [1m[36mSiteUpload Load (0.4ms)[0m  [1m[34mSELECT "site_uploads".* FROM "site_uploads" WHERE "site_uploads"."var" = $1 LIMIT $2[0m  [["var", "thumbnail"], ["LIMIT", 1]]
+Cache write: site_uploads/thumbnail
+Cache read: rails_settings_cached/dee105b9b0f794d7892ed15d2bd30415/site_short_description
+Cache generate: rails_settings_cached/dee105b9b0f794d7892ed15d2bd30415/site_short_description
+  [1m[36mSetting Load (0.7ms)[0m  [1m[34mSELECT "settings".* FROM "settings" WHERE (thing_type is NULL and thing_id is NULL) AND "settings"."var" = $1 ORDER BY "settings"."id" ASC LIMIT $2[0m  [["var", "site_short_description"], ["LIMIT", 1]]
+Cache write: rails_settings_cached/dee105b9b0f794d7892ed15d2bd30415/site_short_description
+Cache read: rails_settings_cached/dee105b9b0f794d7892ed15d2bd30415/site_title
+Cache generate: rails_settings_cached/dee105b9b0f794d7892ed15d2bd30415/site_title
+  [1m[36mSetting Load (0.4ms)[0m  [1m[34mSELECT "settings".* FROM "settings" WHERE (thing_type is NULL and thing_id is NULL) AND "settings"."var" = $1 ORDER BY "settings"."id" ASC LIMIT $2[0m  [["var", "site_title"], ["LIMIT", 1]]
+Cache write: rails_settings_cached/dee105b9b0f794d7892ed15d2bd30415/site_title
+[Webpacker] Compiling...

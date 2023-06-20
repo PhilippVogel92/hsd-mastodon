@@ -101,6 +101,7 @@ def persist_status_tag_relation(status_id, tag_id):
     """
     cur = conn.cursor()
     cur.execute("INSERT INTO statuses_tags (status_id, tag_id) VALUES (%s, %s);", (status_id, tag_id,))
+    conn.commit()
     cur.close()
     return True
 

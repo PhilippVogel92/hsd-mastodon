@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from ..model.mastodon_data_db import get_toot_by_id
 
 from recommender_api.utils.tfidf_demo import (
     recommend_with_tfidf_for_account,
@@ -41,11 +42,11 @@ def get_account_recommendations_with_ranking_system():
     return jsonify(recommendations)
 
 
-@recommender_route.route("/generate-tag", methods=["POST"])
+@recommender_route.route("/toots/<toot_id>/generate-tags", methods=["POST"])
 # @cross_origin()
-def generate_tag_for_toot():
-    user_input = request.get_json()
-    keyword_extractor = KeywordExtractor(user_input["toot"], nlp_model_loader)
+def generate_tag_for_toot(toot_id):
+    toot = get_toot_by_id(toot_id)
+    keyword_extractor = KeywordExtractor(toot, nlp_model_loader)
     toot_with_tag = keyword_extractor.generate_hashtags()
     return jsonify(toot_with_tag)
 

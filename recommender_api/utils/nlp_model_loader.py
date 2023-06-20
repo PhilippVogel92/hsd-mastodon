@@ -11,7 +11,7 @@ class NLPModelLoader:
         """Load an NLP model and store it in the models dictionary."""
         if model_name not in self.models:
             nlp = spacy.load(model_name)
-            print("NLP Spacy Model " + nlp.meta["lang"] + "_" + nlp.meta["name"] + "is loading...")
+            print("NLP Spacy Model " + nlp.meta["lang"] + "_" + nlp.meta["name"] + " is loading...")
             self.models[model_name] = nlp
         return self.models[model_name]
 

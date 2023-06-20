@@ -6,8 +6,9 @@ import html2text
 class TextPreprocessor:
     """Class to preprocess text data."""
 
-    def __init__(self, nlp_model_loader, nlp_model="de_core_news_lg"):
+    def __init__(self, nlp_model_loader, toot=None, nlp_model="de_core_news_lg"):
         self.nlp = nlp_model_loader.get_model(nlp_model)
+        self.toot = toot
 
     def replace_newlines_in_url(self, match):
         url = match.group()
@@ -42,3 +43,16 @@ class TextPreprocessor:
         sentence = self.lower_words(sentence)
         sentence = self.lemmatize_text(sentence)
         return sentence
+
+    def toot_preprocessing(self):
+        if self.toot is None:
+            raise Exception("No toot provided.")
+
+        sentence = self.toot["content"]
+        sentence = self.remove_html_tags(sentence)
+        sentence = self.remove_newlines_in_text(sentence)
+        sentence = self.remove_tag_urls(sentence)
+        sentence = self.lower_words(sentence)
+        sentence = self.lemmatize_text(sentence)
+        self.toot["preprocessed_content"] = sentence
+        return self.toot

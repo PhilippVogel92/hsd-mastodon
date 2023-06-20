@@ -7,6 +7,7 @@ from recommender_api.utils.tfidf_demo import (
 from recommender_api.utils.ranking_system import RankingSystem
 from recommender_api.utils.hashtag_modelling import KeywordExtractor
 from recommender_api.utils.nlp_model_loader import NLPModelLoader
+from recommender_api.utils.preprocessing import TextPreprocessor
 
 recommender_route = Blueprint("recommender_route", __name__)
 
@@ -47,5 +48,12 @@ def generate_tag_for_toot():
     keyword_extractor = KeywordExtractor(user_input["toot"], nlp_model_loader)
     toot_with_tag = keyword_extractor.generate_hashtags()
     return jsonify(toot_with_tag)
-    """ except:
-        return jsonify({"error": "Something went wrong."}) """
+
+
+@recommender_route.route("/preprocess-toot", methods=["POST"])
+# @cross_origin()
+def preprocess_toot():
+    user_input = request.get_json()
+    text_preprocessor = TextPreprocessor(nlp_model_loader, user_input["toot"])
+    preprocessed_toot = text_preprocessor.toot_preprocessing()
+    return jsonify(preprocessed_toot)

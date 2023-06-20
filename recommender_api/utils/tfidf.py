@@ -66,9 +66,11 @@ class TFIDFRecommender:
     def recommend_toots_from_follower(self, account_id):
         # get toots of user
         account_toots = get_account_toots(account_id)
+        
+        # preprocess toots
         preprocessor = TextPreprocessor(self.nlp_model_loader)
-
         account_toots["preprocessed_content"] = account_toots["content"].apply(preprocessor.sentence_preprocessing)
+        
         # get accounts followed by the user and collect relevant toots
         followed_accounts = get_followed_accounts(account_id)
         followed_toots = pd.DataFrame()

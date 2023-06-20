@@ -40,8 +40,6 @@ class KeywordExtractor:
                 if token.text not in keywords:
                     keywords.append(token.text)
 
-        # keywords = [token.text for token in doc if token.pos_ in ["VERB", "NOUN", "PROPN"]]
-
         return keywords
 
     def match_hashtags_with_text(self, hashtags, text):

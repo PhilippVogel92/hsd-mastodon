@@ -6,7 +6,7 @@ from .preprocessing import TextPreprocessor
 class KeywordExtractor:
     """Class to extract keywords from a text and compare them with hashtags."""
 
-    def __init__(self, toot, nlp_model_loader, treshold=0.7):
+    def __init__(self, toot, nlp_model_loader, treshold=0.5):
         self.nlp_model_loader = nlp_model_loader
         self.nlp = self.choose_nlp_model(toot)
         self.treshold = treshold
@@ -32,8 +32,15 @@ class KeywordExtractor:
         """Function to extract keywords from a text."""
         doc = self.nlp(text)
 
+        keywords = []
+
         # Extract keywords from text
-        keywords = [token.text for token in doc if token.pos_ in ["VERB", "NOUN", "PROPN"]]
+        for token in doc:
+            if token.pos_ in ["VERB", "NOUN", "PROPN"]:
+                if token.text not in keywords:
+                    keywords.append(token.text)
+
+        # keywords = [token.text for token in doc if token.pos_ in ["VERB", "NOUN", "PROPN"]]
 
         return keywords
 
@@ -42,7 +49,7 @@ class KeywordExtractor:
         matches = []
         keywords = self.extract_keywords(text)
 
-        print(text, keywords, hashtags)
+        print("Input Text:", text, "Keywords found:", keywords)
         for keyword in keywords:
             keyword_doc = self.nlp(keyword.lower())
 
@@ -51,10 +58,11 @@ class KeywordExtractor:
 
                 similarity = keyword_doc.similarity(hashtag_doc)
 
-                print("Schlagwort:", keyword, "Hashtag:", hashtag, "Ähnlichkeit:", similarity)
+                print("Schlagwort:", keyword, "  Hashtag:", hashtag, "  Ähnlichkeit:", similarity)
 
                 if similarity >= self.treshold:
-                    matches.append(hashtag)
+                    if hashtag not in matches:
+                        matches.append(hashtag)
 
         return matches
 

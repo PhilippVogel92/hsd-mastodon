@@ -13,6 +13,7 @@ class KeywordExtractor:
         self.toot = toot
 
     def choose_nlp_model(self, toot):
+        """Function to choose the right NLP model."""
         language = toot["language"]
         nlp_model = "de_core_news_lg"
         if language == "en":
@@ -28,53 +29,30 @@ class KeywordExtractor:
         return len(toot["tags"]) != 0
 
     def extract_keywords(self, text):
-        # Verarbeitung des Textes mit Spacy
+        """Function to extract keywords from a text."""
         doc = self.nlp(text)
 
-        # Extraktion der Schlagwörter
+        # Extract keywords from text
         keywords = [token.text for token in doc if token.pos_ in ["VERB", "NOUN", "PROPN"]]
 
         return keywords
 
-    def compare_hashtags_with_keywords(self, hashtags, keywords):
-        # Abgleich der Schlagwörter mit den Hashtags
-        matches = []
-        for keyword in keywords:
-            keyword_doc = self.nlp(keyword.lower())
-
-            for hashtag in hashtags:
-                hashtag_doc = self.nlp(hashtag.lower())
-
-                similarity = keyword_doc.similarity(hashtag_doc)
-
-                # df = pd.DataFrame({"Schlagwort": [keyword], "Hashtag": [hashtag], "Ähnlichkeit": [similarity]})
-                # print(df)
-
-                if similarity >= self.treshold:
-                    matches.append(hashtag, similarity)
-
-        return matches
-
     def match_hashtags_with_text(self, hashtags, text):
-        # Abgleich der Hashtags mit dem Text
+        """Function to match hashtags with text."""
         matches = []
         keywords = self.extract_keywords(text)
 
         print(text, keywords, hashtags)
         for keyword in keywords:
-            # Verarbeitung des Schlagworts mit Spacy
             keyword_doc = self.nlp(keyword.lower())
 
             for hashtag in hashtags:
-                # Verarbeitung des Hashtags mit Spacy
                 hashtag_doc = self.nlp(hashtag.lower())
 
-                # Berechnung der semantischen Ähnlichkeit zwischen Schlagwort und Hashtag
                 similarity = keyword_doc.similarity(hashtag_doc)
 
                 print("Schlagwort:", keyword, "Hashtag:", hashtag, "Ähnlichkeit:", similarity)
 
-                # Überprüfung, ob die Ähnlichkeit über einem bestimmten Schwellenwert liegt
                 if similarity >= self.treshold:
                     matches.append(hashtag)
 
@@ -101,13 +79,23 @@ class KeywordExtractor:
 
         print("Has hashtag:", self.has_hashtag(self.toot))
 
+        # return toot if it already has hashtags
         if self.has_hashtag(self.toot):
             return self.toot
+
+        # initialize text preprocessor
         nlp_model_name = self.nlp.meta["lang"] + "_" + self.nlp.meta["name"]
         text_preprocessor = TextPreprocessor(self.nlp_model_loader, nlp_model_name)
+
+        # preprocess text and clean it from html tags, urls, newlines, etc.
         text = text_preprocessor.sentence_preprocessing(self.toot["content"])
         print("Text:", text)
+
+        # extract keywords from text
         tags = self.match_hashtags_with_text(hashtags, text)
         print("Tags:", tags)
+
+        # add hashtags to toot
         self.toot["tags"] = tags
+
         return self.toot

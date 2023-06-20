@@ -20,7 +20,7 @@ def get_account_id(data):
     json_string = json_string.replace("False", "false")
     json_string = json_string.replace("True", "true")
     json_object = json.loads(json_string)
-    data = data.drop("account")
+    data.drop("account")
     return json_object["id"]
 
 

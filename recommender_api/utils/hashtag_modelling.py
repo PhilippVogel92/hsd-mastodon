@@ -1,11 +1,9 @@
-import spacy
 import pandas as pd
 from .preprocessing import TextPreprocessor
 
 
 class KeywordExtractor:
     """Class to extract keywords from a text and compare them with hashtags."""
-
     def __init__(self, toot, nlp_model_loader, treshold=0.5):
         self.nlp_model_loader = nlp_model_loader
         self.nlp = self.choose_nlp_model(toot)
@@ -65,6 +63,8 @@ class KeywordExtractor:
         return matches
 
     def generate_hashtags(self):
+        """Function to generate hashtags for a toot."""   
+    
         # replace list with hashtags from database
         hashtags = [
             "Mittelaltermarkt",

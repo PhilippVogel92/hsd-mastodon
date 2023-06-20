@@ -2,7 +2,7 @@ import pandas as pd
 import spacy
 from sklearn.metrics.pairwise import cosine_similarity
 
-from .preprocessing import sentence_preprocessing
+from .preprocessing import TextPreprocessor
 from recommender_api.model.mastodon_data import get_account_toots, get_followed_accounts
 import numpy as np
 
@@ -77,7 +77,8 @@ def show_scores(sentence, followed_toots, cosine_sim_sentence):
 def recommend_with_spacy_for_account(account_id, number_of_recommendations=10):
     # get toots of user
     account_toots = get_account_toots(account_id)
-    account_toots["preprocessed_content"] = account_toots["content"].apply(sentence_preprocessing)
+    preprocessor = TextPreprocessor()
+    account_toots["preprocessed_content"] = account_toots["content"].apply(preprocessor.sentence_preprocessing)
     # get accounts followed by the user and collect relevant toots
     followed_accounts = get_followed_accounts(account_id)
     followed_toots = pd.DataFrame()
@@ -85,7 +86,7 @@ def recommend_with_spacy_for_account(account_id, number_of_recommendations=10):
     for account_id in followed_accounts:
         followed_toots = pd.concat([followed_toots, get_account_toots(account_id)])
 
-    followed_toots["preprocessed_content"] = followed_toots["content"].apply(sentence_preprocessing)
+    followed_toots["preprocessed_content"] = followed_toots["content"].apply(preprocessor.sentence_preprocessing)
 
     recommendations = calculate_content_similarity_score(
         account_toots,

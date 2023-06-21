@@ -1,6 +1,6 @@
 import pandas as pd
 from .preprocessing import TextPreprocessor
-
+from ..model.mastodon_data_db import get_tags_by_toot_id, get_all_tags, persist_status_tag_relation
 
 class KeywordExtractor:
     """Class to extract keywords from a text and compare them with hashtags."""
@@ -22,10 +22,6 @@ class KeywordExtractor:
         print("Loaded NLP model:", nlp.meta["lang"] + "_" + nlp.meta["name"])
         return nlp
 
-    def has_hashtag(self, toot):
-        """Function to check if a toot contains hashtags."""
-        return len(toot["tags"]) != 0
-
     def extract_keywords(self, text):
         """Function to extract keywords from a text."""
         doc = self.nlp(text)
@@ -40,25 +36,30 @@ class KeywordExtractor:
 
         return keywords
 
-    def match_hashtags_with_text(self, hashtags, text):
+    def match_hashtags_with_toot(self, hashtags):
         """Function to match hashtags with text."""
         matches = []
-        keywords = self.extract_keywords(text)
+        toot_text = self.toot["preprocessed_content"]
+        toot_id = self.toot["id"]
+        keywords = self.extract_keywords(toot_text)
 
-        print("Input Text:", text, "Keywords found:", keywords)
+        print("Input Text:", toot_text, "Keywords found:", keywords)
         for keyword in keywords:
             keyword_doc = self.nlp(keyword.lower())
 
             for hashtag in hashtags:
-                hashtag_doc = self.nlp(hashtag.lower())
+                hashtag_id = hashtag[0]
+                hashtag_name = hashtag[1]
+                hashtag_doc = self.nlp(hashtag_name.lower())
 
                 similarity = keyword_doc.similarity(hashtag_doc)
 
-                print("Schlagwort:", keyword, "  Hashtag:", hashtag, "  Ähnlichkeit:", similarity)
+                print("Schlagwort:", keyword, "  Hashtag:", hashtag_name, "  Ähnlichkeit:", similarity)
 
                 if similarity >= self.treshold:
-                    if hashtag not in matches:
-                        matches.append(hashtag)
+                    if hashtag_name not in matches:
+                        matches.append(hashtag_name)
+                        persist_status_tag_relation(toot_id, hashtag_id)
 
         return matches
 
@@ -66,39 +67,22 @@ class KeywordExtractor:
         """Function to generate hashtags for a toot."""   
     
         # replace list with hashtags from database
-        hashtags = [
-            "Mittelaltermarkt",
-            "Sport",
-            "Essen",
-            "Mensa",
-            "Ritter",
-            "Bier",
-            "Kochen",
-            "Kunst",
-            "Kultur",
-            "Musik",
-            "Datascience",
-            "Coding",
-            "studieren",
-            "Development",
-        ]
+        hashtags = get_all_tags()
 
-        print("Has hashtag:", self.has_hashtag(self.toot))
+        toot_tags = get_tags_by_toot_id(self.toot["id"])
 
-        # return toot if it already has hashtags
-        if self.has_hashtag(self.toot):
-            return self.toot
+        hashtags = [hashtag for hashtag in hashtags if hashtag[0] not in toot_tags]
 
         # initialize text preprocessor
         nlp_model_name = self.nlp.meta["lang"] + "_" + self.nlp.meta["name"]
         text_preprocessor = TextPreprocessor(self.nlp_model_loader, nlp_model_name)
 
         # preprocess text and clean it from html tags, urls, newlines, etc.
-        text = text_preprocessor.sentence_preprocessing(self.toot["content"])
-        print("Text:", text)
+        self.toot["preprocessed_content"] = text_preprocessor.sentence_preprocessing(self.toot["text"])
+        print("Text:", self.toot["preprocessed_content"])
 
         # extract keywords from text
-        tags = self.match_hashtags_with_text(hashtags, text)
+        tags = self.match_hashtags_with_toot(hashtags)
         print("Tags:", tags)
 
         # add hashtags to toot

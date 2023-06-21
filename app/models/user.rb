@@ -123,6 +123,7 @@ class User < ApplicationRecord
   before_create :set_approved
   after_commit :send_pending_devise_notifications
   after_create_commit :trigger_webhooks
+  after_create_commit :send_welcome_message
 
   # This avoids a deprecation warning from Rails 5.1
   # It seems possible that a future release of devise-two-factor will
@@ -462,6 +463,23 @@ class User < ApplicationRecord
 
   def render_and_send_devise_message(notification, *args, **kwargs)
     devise_mailer.send(notification, self, *args, **kwargs).deliver_later
+  end
+
+  def send_welcome_message
+    welcome_message = "Willkommen an der HSD Mastodon-Instanz! 🎉 \n      
+Wir freuen uns, dich als Teil unserer Community begrüßen zu dürfen. Hier hast du die Möglichkeit, dich mit anderen Studierenden, Lehrenden und Mitarbeitern auszutauschen, Informationen zu teilen und spannende Diskussionen zu führen.\n
+Um bessere Vorschläge zu erhalten, kannst du auf der Startseite (https://mastodon.hosting.medien.hs-duesseldorf.de/start) deine Interessen angeben.\n
+Viel Spaß und eine tolle Zeit an der HSD Mastodon-Instanz! 😊"
+
+    attachment = MediaAttachment.find_by(id: 110583755146446553)
+
+    status = Status.create(
+      account: self.account,
+      text: welcome_message,
+      media_attachments: [attachment]
+    )
+
+    status.save!
   end
 
   def set_approved

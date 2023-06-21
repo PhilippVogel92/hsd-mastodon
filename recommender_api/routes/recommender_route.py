@@ -6,7 +6,7 @@ from recommender_api.utils.tfidf_demo import (
 )
 
 from recommender_api.utils.ranking_system import RankingSystem
-from recommender_api.utils.hashtag_modelling import KeywordExtractor
+from recommender_api.utils.hashtag_modelling import TagGenerator
 from recommender_api.utils.nlp_model_loader import NLPModelLoader
 from recommender_api.utils.preprocessing import TextPreprocessor
 
@@ -46,7 +46,7 @@ def get_account_recommendations_with_ranking_system():
 # @cross_origin()
 def generate_tag_for_toot(toot_id):
     toot = get_toot_by_id(toot_id)
-    keyword_extractor = KeywordExtractor(toot, nlp_model_loader)
+    keyword_extractor = TagGenerator(toot, nlp_model_loader)
     toot_with_tag = keyword_extractor.generate_hashtags()
     return jsonify(toot_with_tag)
 

@@ -2,7 +2,7 @@ import pandas as pd
 from .preprocessing import TextPreprocessor
 from ..model.mastodon_data_db import get_tags_by_toot_id, get_all_tags, persist_status_tag_relation
 
-class KeywordExtractor:
+class TagGenerator:
     """Class to extract keywords from a text and compare them with hashtags."""
     def __init__(self, toot, nlp_model_loader, treshold=0.5):
         self.nlp_model_loader = nlp_model_loader

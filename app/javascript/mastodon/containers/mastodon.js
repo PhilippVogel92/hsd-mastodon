@@ -11,8 +11,8 @@ import { fetchCustomEmojis } from 'mastodon/actions/custom_emojis';
 import { hydrateStore } from 'mastodon/actions/store';
 import { connectUserStream } from 'mastodon/actions/streaming';
 import ErrorBoundary from 'mastodon/components/error_boundary';
-import initialState, { title as siteTitle } from 'mastodon/initial_state';
 import { getLocale } from 'mastodon/locales';
+import initialState, { title as siteTitle } from 'mastodon/initial_state';
 
 const { localeData, messages } = getLocale();
 addLocaleData(localeData);

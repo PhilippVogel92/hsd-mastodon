@@ -23,7 +23,7 @@ class SearchPopout extends React.PureComponent {
           <li><em>@username@domain</em> <FormattedMessage id='search_popout.tips.user' defaultMessage='user' /></li>
           <li><em>URL</em> <FormattedMessage id='search_popout.tips.user' defaultMessage='user' /></li>
           <li><em>URL</em> <FormattedMessage id='search_popout.tips.status' defaultMessage='status' /></li>
-        </ul> 
+        </ul>
 
         {extraInformation}
       </div>

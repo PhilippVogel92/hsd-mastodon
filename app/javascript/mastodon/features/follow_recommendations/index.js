@@ -13,7 +13,6 @@ import Account from './components/account';
 import imageGreeting from 'mastodon/../images/elephant_ui_greeting.svg';
 import Button from 'mastodon/components/button';
 import { Helmet } from 'react-helmet';
-import InterestsFilter from 'mastodon/features/compose/containers/interests_filter_container';
 
 const mapStateToProps = state => ({
   suggestions: state.getIn(['suggestions', 'items']),
@@ -82,9 +81,9 @@ class FollowRecommendations extends ImmutablePureComponent {
             <svg viewBox='0 0 79 79' className='logo'>
               <use xlinkHref='#logo-symbol-icon' />
             </svg>
-            <h3><FormattedMessage id='interests_selection.heading' defaultMessage='Provide interests to improve timeline recommendations.' /></h3>
-            <InterestsFilter />
+
             <h3><FormattedMessage id='follow_recommendations.heading' defaultMessage="Follow people you'd like to see posts from! Here are some suggestions." /></h3>
+            <p><FormattedMessage id='follow_recommendations.lead' defaultMessage="Posts from people you follow will show up in chronological order on your home feed. Don't be afraid to make mistakes, you can unfollow people just as easily any time!" /></p>
           </div>
 
           {!isLoading && (

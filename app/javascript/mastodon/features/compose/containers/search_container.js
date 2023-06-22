@@ -6,7 +6,7 @@ import {
   showSearch,
 } from '../../../actions/search';
 import Search from '../components/search';
- 
+
 const mapStateToProps = state => ({
   value: state.getIn(['search', 'value']),
   submitted: state.getIn(['search', 'submitted']),

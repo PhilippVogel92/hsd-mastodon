@@ -4739,55 +4739,6 @@ a.status-card.compact:hover {
   position: relative;
 }
 
-.interests-filter {
-  @extend .search;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  align-items: center;
-  row-gap: 5px;
-
-  .search__input {
-    border: 1px solid lighten($ui-base-color, 8%);
-    background: darken($ui-base-color, 2%);
-  }
-
-  .search-results__section {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  .new-hashtag {
-    &,
-    p {
-      margin-bottom: 5px;
-    }
-
-    .button {
-      width: fit-content;
-    }
-  }
-
-  .interests-hashtag {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    margin: 10px;
-    padding: 5px 10px;
-    border: 1px solid lighten($ui-base-color, 8%);
-    border-radius: 4px;
-
-    &:hover,
-    &.followed {
-      background: lighten($ui-base-color, 8%);
-    }
-
-    i {
-      margin-left: 5px;
-    }
-  }
-}
-
 .search__input {
   @include search-input;
 

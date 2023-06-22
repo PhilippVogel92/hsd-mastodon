@@ -23,7 +23,6 @@ import compose from './compose';
 import search from './search';
 import media_attachments from './media_attachments';
 import notifications from './notifications';
-import interests_filter from './interests_filter';
 import height_cache from './height_cache';
 import custom_emojis from './custom_emojis';
 import lists from './lists';
@@ -68,7 +67,6 @@ const reducers = {
   contexts,
   compose,
   search,
-  interests_filter,
   media_attachments,
   notifications,
   height_cache,

@@ -7,7 +7,7 @@ import {
   SEARCH_SHOW,
   SEARCH_EXPAND_SUCCESS,
 } from '../actions/search';
-import { 
+import {
   COMPOSE_MENTION,
   COMPOSE_REPLY,
   COMPOSE_DIRECT,

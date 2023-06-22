@@ -93,7 +93,7 @@ class TagSearchService < BaseService
       results.delete(exact_match)
       results = [exact_match] + results
     end
-    
+
     results
   end
 

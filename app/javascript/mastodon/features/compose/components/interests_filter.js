@@ -2,15 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import Icon from 'mastodon/components/icon';
-import InterestsFilterHashtag from './interests_filter_hashtag';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 const messages = defineMessages({
   placeholder: { id: 'interests_selection.search', defaultMessage: 'Search for tags' },
 });
 
-export default
-@injectIntl
+export default @injectIntl
 class InterestsFilter extends React.PureComponent {
 
   static contextTypes = {
@@ -30,8 +28,8 @@ class InterestsFilter extends React.PureComponent {
     openInRoute: PropTypes.bool,
     intl: PropTypes.object.isRequired,
     singleColumn: PropTypes.bool,
-    results: ImmutablePropTypes.map.isRequired,
-    initFollowedTags: ImmutablePropTypes.list.isRequired,
+    results: ImmutablePropTypes.map,
+    initFollowedTags: ImmutablePropTypes.list,
   };
 
   state = {
@@ -85,9 +83,9 @@ class InterestsFilter extends React.PureComponent {
 
   handleFollowInterestSubmit = () => {
     let tagAlreadyFollowed = this.state.followedTags.filter(hashtag => hashtag.get('name') === this.props.value).size > 0;
-    if (tagAlreadyFollowed === true) return;
+    if(tagAlreadyFollowed === true) return;
     this.props.followInterest(this.props.value);
-    if (this.props.results.get('hashtags')?.size === 0) {
+    if(this.props.results.get('hashtags')?.size === 0) {
       this.props.onChange('');
     }
     let newTag = new Map();
@@ -129,7 +127,6 @@ class InterestsFilter extends React.PureComponent {
   handleBlur = () => {
     this.setState({ expanded: false });
   };
-
   render() {
     const { intl, value, submitted, results } = this.props;
     const { followedTags } = this.state;
@@ -165,41 +162,44 @@ class InterestsFilter extends React.PureComponent {
           />
         </div>
 
-        {results.get('hashtags') !== undefined &&
-          results.get('hashtags').size === 0 &&
-          value !== '' ? (
-            <div className='new-hashtag'>
-              <p><FormattedMessage id='interests_selection.search.empty' values={{ hashtag: value }} defaultMessage='The hashtag {hashtag} does not yet exist' /> </p>
-              <button className='button' onClick={this.handleFollowInterestSubmit}><FormattedMessage id='interests_selection.create_hashtag' defaultMessage='Create hashtag' /></button>
-            </div>
-          ) : !notFollowedTags?.size ? null : (
+        {results.get('hashtags') !== undefined && results.get('hashtags').size === 0 && value !== '' ?
+          <div className='new-hashtag'>
+            <p><FormattedMessage id='interests_selection.search.empty' values={{ hashtag: value }} defaultMessage='The hashtag {hashtag} does not yet exist' /></p>
+            <button className='button' onClick={this.handleFollowInterestSubmit}><FormattedMessage id='interests_selection.create_hashtag' defaultMessage='Create hashtag' /></button>
+          </div> : !notFollowedTags?.size ? null :
             <div className='search-results__section'>
               {notFollowedTags.map(hashtag => (
-                <InterestsFilterHashtag
-                  hashtag={hashtag}
-                  isFollowingHashtagsList={false}
-                  onClick={this.handleFollowInterest}
+                <div
+                  className='interests-hashtag'
+                  onClick={() => this.handleFollowInterest(hashtag)}
                   key={hashtag.get('name')}
-                />
+                >
+                  {hashtag.get('name')}
+                </div>
               ))}
             </div>
-          )}
+        }
 
-        <h3><FormattedMessage id='interests_selection.followed_hashtags.title' defaultMessage='Your followed hashtags' /></h3>
-        {followedTags.size === 0 ? (
-          <p><FormattedMessage id='interests_selection.followed_hashtags.empty' defaultMessage='You dont follow any hashtags' /></p>
-        ) : (
+        <h3><FormattedMessage id='interests_selection.followed_hashtags.title' defaultMessage='Your followed hashtags' />
+        </h3>
+        {followedTags.size === 0 ?
+          <p><FormattedMessage
+            id='interests_selection.followed_hashtags.empty'
+            defaultMessage='You dont follow any hashtags'
+          /></p> :
           <div className='search-results__section'>
             {followedTags.map(hashtag => (
-              <InterestsFilterHashtag
-                hashtag={hashtag}
-                isFollowingHashtagsList
-                onClick={this.handleUnfollowInterest}
+              <div
+                className='interests-hashtag followed'
+                onClick={() => this.handleUnfollowInterest(hashtag)}
                 key={hashtag.get('name')}
-              />
+              >
+                {hashtag.get('name')}
+                <Icon id='times-circle' />
+              </div>
             ))}
           </div>
-        )}
+        }
       </div>
     );
   }

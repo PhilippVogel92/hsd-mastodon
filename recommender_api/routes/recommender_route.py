@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from ..model.mastodon_data_db import get_toot_by_id
+from ..model.mastodon_data_db import get_status_by_id
 
 from recommender_api.utils.tfidf_demo import (
     recommend_with_tfidf_for_account,
@@ -42,19 +42,19 @@ def get_account_recommendations_with_ranking_system():
     return jsonify(recommendations)
 
 
-@recommender_route.route("/toots/<toot_id>/generate-tags", methods=["POST"])
+@recommender_route.route("/statuses/<status_id>/generate-tags", methods=["POST"])
 # @cross_origin()
-def generate_tag_for_toot(toot_id):
-    toot = get_toot_by_id(toot_id)
-    keyword_extractor = TagGenerator(toot, nlp_model_loader)
-    toot_with_tag = keyword_extractor.generate_hashtags()
-    return jsonify(toot_with_tag)
+def generate_tag_for_status(status_id):
+    status = get_status_by_id(status_id)
+    keyword_extractor = TagGenerator(status, nlp_model_loader)
+    status_with_tag = keyword_extractor.generate_hashtags()
+    return jsonify(status_with_tag)
 
 
-@recommender_route.route("/preprocess-toot", methods=["POST"])
+@recommender_route.route("/preprocess-status", methods=["POST"])
 # @cross_origin()
-def preprocess_toot():
+def preprocess_status():
     user_input = request.get_json()
-    text_preprocessor = TextPreprocessor(nlp_model_loader, user_input["toot"])
-    preprocessed_toot = text_preprocessor.toot_preprocessing()
-    return jsonify(preprocessed_toot)
+    text_preprocessor = TextPreprocessor(nlp_model_loader, user_input["status"])
+    preprocessed_status = text_preprocessor.status_preprocessing()
+    return jsonify(preprocessed_status)

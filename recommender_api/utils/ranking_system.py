@@ -1,11 +1,10 @@
 from .tfidf import TFIDFRecommender
 from .spacy_sim import recommend_with_spacy_for_account
-from .hashtag_modelling import KeywordExtractor
 import pandas as pd
 
 
 class RankingSystem:
-    """Class to calculate the ranking score of a toot."""
+    """Class to calculate the ranking score of a status."""
 
     def __init__(
         self,
@@ -29,39 +28,39 @@ class RankingSystem:
     def set_interaction_weight(self, weight):
         self.interaction_weight = weight
 
-    def calculate_interaction_score(self, toot_df):
-        """Function to calculate the interaction score of a toot."""
+    def calculate_interaction_score(self, status_df):
+        """Function to calculate the interaction score of a status."""
 
         # Calculate the interaction score
-        toot_df["interaction_score"] = (
-            toot_df["favourites_count"] + toot_df["replies_count"] + toot_df["reblogs_count"]
+        status_df["interaction_score"] = (
+            status_df["favourites_count"] + status_df["replies_count"] + status_df["reblogs_count"]
         )
 
         # Normalize the interaction score to the value range [0, 1]
-        max_interaction_score = toot_df["interaction_score"].max()
-        toot_df["interaction_score"] = toot_df["interaction_score"] / max_interaction_score
+        max_interaction_score = status_df["interaction_score"].max()
+        status_df["interaction_score"] = status_df["interaction_score"] / max_interaction_score
 
-        return toot_df
+        return status_df
 
-    def calculate_ranking_score(self, toot_df):
-        """Function to calculate the ranking score of a toot."""
+    def calculate_ranking_score(self, status_df):
+        """Function to calculate the ranking score of a status."""
 
         # Calculate the ranking score
-        toot_df["ranking_score"] = (self.similarity_weight * toot_df["cosine_sim"]) + (
-            self.interaction_weight * toot_df["interaction_score"]
+        status_df["ranking_score"] = (self.similarity_weight * status_df["cosine_sim"]) + (
+            self.interaction_weight * status_df["interaction_score"]
         )
 
         if self.sort_by_ranking_score:
             # Sort the DataFrame according to the ranking score (descending)
-            toot_df.sort_values("ranking_score", ascending=False, inplace=True)
-            toot_df.reset_index(drop=True, inplace=True)
+            status_df.sort_values("ranking_score", ascending=False, inplace=True)
+            status_df.reset_index(drop=True, inplace=True)
 
-        return toot_df
+        return status_df
 
     def get_recommendations_with_ranking_system(self, account_id):
         if self.similarity_concept == "tfidf":
             tfidf_recommender = TFIDFRecommender(self.number_of_recommendations, self.nlp_model_loader)
-            recommendations_for_account = tfidf_recommender.recommend_toots_from_follower(account_id)
+            recommendations_for_account = tfidf_recommender.recommend_statuses_from_follower(account_id)
         elif self.similarity_concept == "spacy":
             recommendations_for_account = recommend_with_spacy_for_account(account_id, self.number_of_recommendations)
         else:

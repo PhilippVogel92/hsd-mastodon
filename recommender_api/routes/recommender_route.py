@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from ..model.mastodon_data_db import get_status_by_id
+from ..model.status_queries import get_status_by_id
 
 from recommender_api.utils.tfidf_demo import (
     recommend_with_tfidf_for_account,
@@ -46,8 +46,8 @@ def get_account_recommendations_with_ranking_system():
 # @cross_origin()
 def generate_tag_for_status(status_id):
     status = get_status_by_id(status_id)
-    keyword_extractor = TagGenerator(status, nlp_model_loader)
-    status_with_tag = keyword_extractor.generate_hashtags()
+    tag_generator = TagGenerator(status, nlp_model_loader)
+    status_with_tag = tag_generator.generate_hashtags()
     return jsonify(status_with_tag)
 
 

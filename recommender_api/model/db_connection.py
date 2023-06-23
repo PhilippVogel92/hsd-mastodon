@@ -5,8 +5,8 @@ import psycopg2
 
 
 # Load database connection parameters
-load_dotenv("recommender_api/.env.vagrant.sample")
 load_dotenv()
+
 
 print(os.getenv("DB_NAME"))
 # Connect to the database

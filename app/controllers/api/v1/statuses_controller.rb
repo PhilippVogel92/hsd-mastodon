@@ -67,11 +67,6 @@ class Api::V1::StatusesController < Api::BaseController
       with_rate_limit: true
     )
 
-    http = Net::HTTP.new("localhost", 5000)
-    http.use_ssl = false
-    request = Net::HTTP::Post.new("toots/#{@status.id}/generate-tags")
-    http.request(request)
-
     render json: @status, serializer: @status.is_a?(ScheduledStatus) ? REST::ScheduledStatusSerializer : REST::StatusSerializer
   end
 

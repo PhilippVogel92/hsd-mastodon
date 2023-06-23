@@ -308,6 +308,7 @@ class Status < ApplicationRecord
 
   after_create_commit :store_uri, if: :local?
   after_create_commit :update_statistics, if: :local?
+  after_create_commit :allocate_interests
 
   before_validation :prepare_contents, if: :local?
   before_validation :set_reblog
@@ -534,5 +535,9 @@ class Status < ApplicationRecord
     account&.decrement_count!(:statuses_count)
     reblog&.decrement_count!(:reblogs_count) if reblog?
     thread&.decrement_count!(:replies_count) if in_reply_to_id.present? && distributable?
+  end
+
+  def allocate_interests
+    AllocateTagsJob.perform_later self.id
   end
 end

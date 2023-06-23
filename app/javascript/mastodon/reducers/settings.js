@@ -12,7 +12,7 @@ const initialState = ImmutableMap({
   saved: true,
 
   skinTone: 1,
-
+ 
   trends: ImmutableMap({
     show: true,
   }),

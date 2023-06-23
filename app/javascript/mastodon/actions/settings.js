@@ -9,7 +9,7 @@ export function changeSetting(path, value) {
   return dispatch => {
     dispatch({
       type: SETTING_CHANGE,
-      path,
+      path, 
       value,
     });
 

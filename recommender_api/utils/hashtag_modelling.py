@@ -42,7 +42,7 @@ class KeywordExtractor:
         toot_text = self.toot["preprocessed_content"]
         toot_id = self.toot["id"]
         keywords = self.extract_keywords(toot_text)
-
+    
         print("Input Text:", toot_text, "Keywords found:", keywords)
         for keyword in keywords:
             keyword_doc = self.nlp(keyword.lower())

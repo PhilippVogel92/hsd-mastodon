@@ -49,6 +49,7 @@
 #  trendable                     :boolean
 #  reviewed_at                   :datetime
 #  requested_review_at           :datetime
+#  recommendations_enabled       :boolean          default(TRUE)
 #
 
 class Account < ApplicationRecord

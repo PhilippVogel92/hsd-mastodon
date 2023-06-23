@@ -7,4 +7,8 @@ class AllocateTagsJob < ApplicationJob
     request = Net::HTTP::Post.new("toots/#{toot_id}/generate-tags")
     http.request(request)
   end
+
+  def max_attempts
+    1
+  end
 end

@@ -15,7 +15,6 @@ class ColumnSettings extends React.PureComponent {
 
   render () {
     const { settings, onChange } = this.props;
-
     return (
       <div>
         <span className='column-settings__section'><FormattedMessage id='home.column_settings.basic' defaultMessage='Basic' /></span>

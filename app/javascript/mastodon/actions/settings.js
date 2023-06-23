@@ -1,6 +1,7 @@
 import api from '../api';
 import { debounce } from 'lodash';
 import { showAlertForError } from './alerts';
+import {expandHomeTimeline} from "./timelines";
 
 export const SETTING_CHANGE = 'SETTING_CHANGE';
 export const SETTING_SAVE   = 'SETTING_SAVE';
@@ -12,7 +13,9 @@ export function changeSetting(path, value) {
       path, 
       value,
     });
-
+    /*if(["home", "enable", "recommendations"].every(v => path.includes(v))) {
+      dispatch(expandHomeTimeline({}));
+    }*/
     dispatch(saveSettings());
   };
 }
@@ -21,7 +24,6 @@ const debouncedSave = debounce((dispatch, getState) => {
   if (getState().getIn(['settings', 'saved'])) {
     return;
   }
-
   const data = getState().get('settings').filter((_, path) => path !== 'saved').toJS();
 
   api().put('/api/web/settings', { data })

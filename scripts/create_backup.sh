@@ -7,15 +7,12 @@
 #
 # A cronjob should be set up to run this script regularly.
 # Example crontab entry:
-# 0 4 * * * /home/mastodon/live/scripts/create_backup.sh
+# 0 4 * * * cd /home/mastodon/live/scripts/ && ./create_backup.sh
 #
 # ** This script should be run as the mastodon user. **
 #
 # See ProjectBase documentation for more information and recovery instructions:
 # https://projectbase.medien.hs-duesseldorf.de/se/hsd-mastodon/-/wikis/Technische-Dokumentation/Automatisierte-Backups
-
-# Backup Mastodon PostgreSQL database to temporary file
-pg_dump -Fc mastodon_production > /home/mastodon/.backup-tmp/db.dump
 
 # Export all variables from the .env file
 set -a
@@ -27,6 +24,10 @@ info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
 trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 
 info "Starting backup"
+
+# Backup Mastodon PostgreSQL database to temporary file
+pg_dump -Fc mastodon_production > /home/mastodon/.backup-tmp/db.dump
+dbexport_exit=$?
 
 # Backup the most important directories into an archive named after
 # the machine this script is currently running on:
@@ -49,10 +50,10 @@ borg create                         \
     /home/mastodon/.backup-tmp      \
     /var/lib/redis
 
+backup_exit=$?
+
 # Remove temporary database dump
 rm /home/mastodon/.backup-tmp/db.dump
-
-backup_exit=$?
 
 info "Pruning repository"
 
@@ -72,13 +73,14 @@ prune_exit=$?
 
 # use highest exit code as global exit code
 global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))
+global_exit=$(( global_exit > dbexport_exit ? global_exit : dbexport_exit ))
 
 if [ ${global_exit} -eq 0 ]; then
-    info "Backup and Prune finished successfully"
+    info "Database export, Backup and Prune finished successfully"
 elif [ ${global_exit} -eq 1 ]; then
-    info "Backup and Prune finished with warnings"
+    info "Database export, Backup and Prune finished with warnings"
 else
-    info "Backup and Prune finished with errors"
+    info "Database export, Backup and Prune finished with errors"
 fi
 
 exit ${global_exit}

@@ -11,6 +11,9 @@
 # ** It assumes that the Mastodon live server is stopped before running this. **
 
 # Load Ruby environment
+
+set -e # Stop on error
+
 export RAILS_ENV=production
 export PATH="$HOME/.rbenv/bin:$PATH"
 eval "$(rbenv init -)"

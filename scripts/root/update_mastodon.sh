@@ -13,7 +13,20 @@
 
 # Stop Mastodon services
 systemctl stop mastodon-web mastodon-sidekiq mastodon-streaming
+
 # Update Mastodon using a script that will be run as the mastodon user
 sudo -iu mastodon bash -c "cd ~mastodon/live/scripts && ./update_live_server.sh"
+# Check if the update was successful
+if [ $? -ne 0 ]; then
+    echo "Mastodon update failed."
+    exit 1
+fi
+
 # Start Mastodon services
 systemctl start mastodon-web mastodon-sidekiq mastodon-streaming
+# Check if the services started successfully
+if [ $? -ne 0 ]; then
+    echo "Mastodon services failed to start."
+    exit 1
+fi
+

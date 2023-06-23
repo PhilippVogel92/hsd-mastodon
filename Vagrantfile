@@ -92,6 +92,14 @@ bundle exec rails db:setup
 echo 'export RAILS_ENV=development' >> ~/.bash_profile
 echo 'export $(cat "/vagrant/.env.vagrant" | xargs)' >> ~/.bash_profile
 
+# Forward database
+echo "Forwarding database..."
+sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'\t/" /etc/postgresql/12/main/postgresql.conf
+echo "host    all             all             10.0.0.0/8              md5" | sudo tee -a /etc/postgresql/12/main/pg_hba.conf > /dev/null
+echo "host    all             all             192.168.0.0/16          md5" | sudo tee -a /etc/postgresql/12/main/pg_hba.conf > /dev/null
+sudo systemctl restart postgresql.service
+psql -d mastodon_development -c "ALTER USER vagrant WITH PASSWORD 'password'" > /dev/null
+
 SCRIPT
 
 VAGRANTFILE_API_VERSION = "2"
@@ -102,10 +110,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provider :virtualbox do |vb|
     vb.name = "mastodon"
-    vb.customize ["modifyvm", :id, "--memory", "2048"]
+    vb.customize ["modifyvm", :id, "--memory", "8000"]
     # Increase the number of CPUs. Uncomment and adjust to
     # increase performance
-    # vb.customize ["modifyvm", :id, "--cpus", "3"]
+    vb.customize ["modifyvm", :id, "--cpus", "6"]
 
     # Disable VirtualBox DNS proxy to skip long-delay IPv6 resolutions.
     # https://github.com/mitchellh/vagrant/issues/1172
@@ -141,6 +149,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :forwarded_port, guest: 3000, host: 3000
   config.vm.network :forwarded_port, guest: 4000, host: 4000
   config.vm.network :forwarded_port, guest: 8080, host: 8080
+  config.vm.network :forwarded_port, guest: 5432, host: 5432
 
   # Full provisioning script, only runs on first 'vagrant up' or with 'vagrant provision'
   config.vm.provision :shell, inline: $provisionA, privileged: false, reset: true

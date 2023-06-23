@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 import atexit
 import psycopg2
-
+from datetime import datetime
 
 # Load database connection parameters
 load_dotenv()
@@ -104,6 +104,41 @@ def persist_status_tag_relation(status_id, tag_id):
     conn.commit()
     cur.close()
     return True
+
+def persist_tag(tag_name):
+    """
+    Persist a tag.
+
+    :return: Boolean.
+    """
+    cur = conn.cursor()
+    cur.execute("INSERT INTO tags (name, created_at, updated_at, display_name) VALUES (%s, %s, %s, %s);", (tag_name.lower(), datetime.now().isoformat(sep=" "), datetime.now().isoformat(sep=" "), tag_name))
+    conn.commit()
+    cur.close()
+    return True
+
+
+def get_tag_by_name(tag_name):
+    """
+    Get a tag by name.
+
+    :return: A specific tag by name.
+    """
+    cur = conn.cursor()
+    cur.execute("SELECT id, name, display_name, created_at, updated_at FROM tags WHERE name = %s;", (tag_name,))
+    response = cur.fetchall()
+    if(len(response) > 0):
+        response = response[0]
+        tag = {
+            "id": response[0], 
+            "name": response[1], 
+            "display_name": response[2],
+            "created_at": response[3],
+            "updated_at": response[4],
+        }
+        cur.close()
+        return tag
+    return None
 
 def get_toot_by_id(toot_id):
     """

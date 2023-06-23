@@ -1,5 +1,6 @@
 from .db_connection import conn
 
+
 def persist_status_tag_relation(status_id, tag_id):
     """
     Persist a relation between status and tag.
@@ -57,3 +58,17 @@ def get_status_by_id(status_id):
 
     cur.close()
     return status
+
+
+def get_account_statuses(account_id):
+    """
+    Get all statuses of an account.
+
+    :param account_id: The id of the account.
+    :return: A list of statuses.
+    """
+    cur = conn.cursor()
+    cur.execute("SELECT text FROM statuses WHERE account_id = %s;", (account_id,))
+    statuses = cur.fetchall()
+    cur.close()
+    return [status[0] for status in statuses]

@@ -2,7 +2,8 @@ import pandas as pd
 from sklearn.metrics.pairwise import linear_kernel
 from sklearn.feature_extraction.text import TfidfVectorizer
 from .preprocessing import TextPreprocessor
-from recommender_api.model.mastodon_data_local import get_account_statuses, get_followed_accounts
+from recommender_api.model.status_queries import get_account_statuses
+from recommender_api.model.account_queries import get_followed_accounts
 
 
 class TFIDFRecommender:
@@ -66,11 +67,13 @@ class TFIDFRecommender:
     def recommend_statuses_from_follower(self, account_id):
         # get statuses of user
         account_statuses = get_account_statuses(account_id)
-        
+
         # preprocess statuses
         preprocessor = TextPreprocessor(self.nlp_model_loader)
-        account_statuses["preprocessed_content"] = account_statuses["content"].apply(preprocessor.sentence_preprocessing)
-        
+        account_statuses["preprocessed_content"] = account_statuses["content"].apply(
+            preprocessor.sentence_preprocessing
+        )
+
         # get accounts followed by the user and collect relevant statuses
         followed_accounts = get_followed_accounts(account_id)
         followed_statuses = pd.DataFrame()
@@ -78,7 +81,9 @@ class TFIDFRecommender:
         for account_id in followed_accounts:
             followed_statuses = pd.concat([followed_statuses, get_account_statuses(account_id)])
 
-        followed_statuses["preprocessed_content"] = followed_statuses["content"].apply(preprocessor.sentence_preprocessing)
+        followed_statuses["preprocessed_content"] = followed_statuses["content"].apply(
+            preprocessor.sentence_preprocessing
+        )
 
         recommendations = self.get_local_recommendations(
             account_statuses,

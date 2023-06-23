@@ -1,20 +1,6 @@
 from .db_connection import conn
 
 
-def get_account_statuses(account_id):
-    """
-    Get all statuses of an account.
-
-    :param account_id: The id of the account.
-    :return: A list of statuses.
-    """
-    cur = conn.cursor()
-    cur.execute("SELECT text FROM statuses WHERE account_id = %s;", (account_id,))
-    statuses = cur.fetchall()
-    cur.close()
-    return [status[0] for status in statuses]
-
-
 def get_followed_accounts(account_id):
     """
     Get all accounts followed by an account.

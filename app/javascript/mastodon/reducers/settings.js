@@ -18,6 +18,9 @@ const initialState = ImmutableMap({
   }),
 
   home: ImmutableMap({
+    enable: {
+      recommendations: true,
+    },
     shows: ImmutableMap({
       reblog: true,
       reply: true,

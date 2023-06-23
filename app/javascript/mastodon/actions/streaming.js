@@ -22,6 +22,7 @@ import {
   deleteAnnouncement,
 } from './announcements';
 import { getLocale } from '../locales';
+import initialState from "../initial_state";
 
 const { messages } = getLocale();
 
@@ -125,6 +126,7 @@ const refreshHomeTimelineAndNotification = (dispatch, done) => {
  */
 export const connectUserStream = () =>
   connectTimelineStream('home', 'user', {}, { fallback: refreshHomeTimelineAndNotification, fillGaps: fillHomeTimelineGaps });
+
 
 /**
  * @param {Object} options

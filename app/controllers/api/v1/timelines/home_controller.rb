@@ -29,7 +29,8 @@ class Api::V1::Timelines::HomeController < Api::BaseController
       limit_param(DEFAULT_STATUSES_LIMIT),
       params[:max_id],
       params[:since_id],
-      params[:min_id]
+      params[:min_id],
+      params[:recommendations]
     )
   end
 

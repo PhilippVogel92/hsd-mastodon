@@ -44,6 +44,7 @@ borg create                         \
     --exclude '/home/mastodon/live/vendor/bundle/*' \
     --exclude '/home/mastodon/live/.rbenv/*' \
     --exclude '/home/mastodon/live/.git/*' \
+    --exclude '/home/mastodon/live/public/system/cache/*' \
                                     \
     ::'{hostname}-{now}'            \
     /home/mastodon/live             \

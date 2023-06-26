@@ -16,28 +16,30 @@ nlp_model_loader = NLPModelLoader()
 nlp_model_loader.load_model("en_core_web_lg")
 nlp_model_loader.load_model("de_core_news_lg")
 
+ranking_system = RankingSystem()
+
 
 @recommender_route.route("/recommend-tfidf/account", methods=["POST"])
 # @cross_origin()
 def get_account_recommendations():
     user_input = request.get_json()
     recommendations = recommend_with_tfidf_for_account(
-        user_input["account_id"], nlp_model_loader, user_input["number_of_recommendations"]
+        user_input["account_id"],
+        nlp_model_loader,
+        user_input["number_of_recommendations"],
     )
     return jsonify(recommendations)
 
 
-@recommender_route.route("/recommend-ranking-system", methods=["POST"])
+@recommender_route.route("/create-sorted-timeline", methods=["POST"])
 # @cross_origin()
-def get_account_recommendations_with_ranking_system():
+def sort_timeline():
     user_input = request.get_json()
-    ranking_system = RankingSystem(
-        number_of_recommendations=user_input["number_of_recommendations"],
-        similarity_concept=user_input["similarity_concept"],
-        nlp_model_loader=nlp_model_loader,
-    )
-    recommendations = ranking_system.get_recommendations_with_ranking_system(
+    recommendations = ranking_system.sort_timeline(
         user_input["account_id"],
+        user_input["status_ids"],
+        nlp_model_loader,
+        user_input["number_of_recommendations"],
     )
     return jsonify(recommendations)
 
@@ -51,6 +53,7 @@ def generate_tag_for_status(status_id):
     return jsonify(status_with_tag)
 
 
+# überarbeiten REST konform!!!
 @recommender_route.route("/preprocess-status", methods=["POST"])
 # @cross_origin()
 def preprocess_status():

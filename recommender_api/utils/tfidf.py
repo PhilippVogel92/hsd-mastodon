@@ -2,8 +2,8 @@ import pandas as pd
 from sklearn.metrics.pairwise import linear_kernel
 from sklearn.feature_extraction.text import TfidfVectorizer
 from .preprocessing import TextPreprocessor
-from recommender_api.model.status_queries import get_account_statuses
 from recommender_api.model.account_queries import get_followed_accounts
+from recommender_api.model.status_queries import get_statuses_by_account_id
 
 
 class TFIDFRecommender:
@@ -15,16 +15,22 @@ class TFIDFRecommender:
         max_score = scored_sentences[0]["cosine_sim"]
         min_score = scored_sentences[-1]["cosine_sim"]
         for index, entry in enumerate(scored_sentences):
-            scored_sentences[index]["cosine_sim"] = (entry["cosine_sim"] - min_score) / (max_score - min_score)
+            scored_sentences[index]["cosine_sim"] = (
+                entry["cosine_sim"] - min_score
+            ) / (max_score - min_score)
         return scored_sentences
 
     def get_local_recommendations(self, account_statuses, followed_statuses):
         tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=1)
         # Generate the tf-idf vectors for the corpus
-        tfidf_matrix = tfidf_vectorizer.fit_transform(followed_statuses["preprocessed_content"].to_list())
+        tfidf_matrix = tfidf_vectorizer.fit_transform(
+            followed_statuses["preprocessed_content"].to_list()
+        )
         sentences_with_cosine_similarity = []
         for _, account_status in account_statuses.iterrows():
-            sentence_vector = tfidf_vectorizer.transform([account_status["preprocessed_content"]])
+            sentence_vector = tfidf_vectorizer.transform(
+                [account_status["preprocessed_content"]]
+            )
             cosine_sim_sentence = linear_kernel(sentence_vector, tfidf_matrix).flatten()
             # show_scores(sentence, followed_statuses, cosine_sim_sentence)
             for index, cosine_sim in enumerate(cosine_sim_sentence):
@@ -33,11 +39,19 @@ class TFIDFRecommender:
                         {
                             "id": followed_statuses.iloc[index]["id"],
                             "sentence": followed_statuses.iloc[index]["content"],
-                            "preprocessed_sentence": followed_statuses.iloc[index]["preprocessed_content"],
+                            "preprocessed_sentence": followed_statuses.iloc[index][
+                                "preprocessed_content"
+                            ],
                             "cosine_sim": cosine_sim,
-                            "reblogs_count": float(followed_statuses.iloc[index]["reblogs_count"]),
-                            "favourites_count": float(followed_statuses.iloc[index]["favourites_count"]),
-                            "replies_count": float(followed_statuses.iloc[index]["replies_count"]),
+                            "reblogs_count": float(
+                                followed_statuses.iloc[index]["reblogs_count"]
+                            ),
+                            "favourites_count": float(
+                                followed_statuses.iloc[index]["favourites_count"]
+                            ),
+                            "replies_count": float(
+                                followed_statuses.iloc[index]["replies_count"]
+                            ),
                             "tags": followed_statuses.iloc[index]["tags"],
                         }
                     )
@@ -45,7 +59,11 @@ class TFIDFRecommender:
                 else:
                     sentences_with_cosine_similarity[index]["cosine_sim"] += cosine_sim
 
-        sim_scores = sorted(sentences_with_cosine_similarity, key=lambda x: x["cosine_sim"], reverse=True)
+        sim_scores = sorted(
+            sentences_with_cosine_similarity,
+            key=lambda x: x["cosine_sim"],
+            reverse=True,
+        )
         normalized_scores = self.normalize(sim_scores)
         return normalized_scores[: self.number_of_recommendations]
 
@@ -66,7 +84,7 @@ class TFIDFRecommender:
 
     def recommend_statuses_from_follower(self, account_id):
         # get statuses of user
-        account_statuses = get_account_statuses(account_id)
+        account_statuses = get_statuses_by_account_id(account_id)
 
         # preprocess statuses
         preprocessor = TextPreprocessor(self.nlp_model_loader)
@@ -79,7 +97,9 @@ class TFIDFRecommender:
         followed_statuses = pd.DataFrame()
         # concate dataframes
         for account_id in followed_accounts:
-            followed_statuses = pd.concat([followed_statuses, get_account_statuses(account_id)])
+            followed_statuses = pd.concat(
+                [followed_statuses, get_statuses_by_account_id(account_id)]
+            )
 
         followed_statuses["preprocessed_content"] = followed_statuses["content"].apply(
             preprocessor.sentence_preprocessing

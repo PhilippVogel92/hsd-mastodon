@@ -466,20 +466,37 @@ class User < ApplicationRecord
   end
 
   def send_welcome_message
-    welcome_message = "Willkommen an der HSD Mastodon-Instanz! 🎉 \n      
+    welcome_message = "@#{self.account.username} Willkommen an der HSD Mastodon-Instanz! 🎉 \n      
 Wir freuen uns, dich als Teil unserer Community begrüßen zu dürfen. Hier hast du die Möglichkeit, dich mit anderen Studierenden, Lehrenden und Mitarbeitern auszutauschen, Informationen zu teilen und spannende Diskussionen zu führen.\n
 Um bessere Vorschläge zu erhalten, kannst du auf der Startseite (https://mastodon.hosting.medien.hs-duesseldorf.de/start) deine Interessen angeben.\n
 Viel Spaß und eine tolle Zeit an der HSD Mastodon-Instanz! 😊"
 
-    attachment = MediaAttachment.find_by(id: 110583755146446553)
+    bot_account = Account.find_by(username: 'welcome_hsd_bot')
 
     status = Status.create(
-      account: self.account,
+      account: bot_account,
       text: welcome_message,
-      media_attachments: [attachment]
+      visibility: 'direct'
     )
 
     status.save!
+
+    mention = Mention.create(
+      status_id: status.id,
+      account_id: self.account.id
+    )
+
+    mention.save!
+
+    notification = Notification.create(
+      activity_id: mention_id,
+      activity_type: 'Mention',
+      account_id: self.account.id,
+      from_account_id: bot_account.id,
+      type: 'mention'
+    )
+
+    notification.save!
   end
 
   def set_approved

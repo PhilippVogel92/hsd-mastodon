@@ -489,7 +489,7 @@ Viel Spaß und eine tolle Zeit an der HSD Mastodon-Instanz! 😊"
     mention.save!
 
     notification = Notification.create(
-      activity_id: mention_id,
+      activity_id: mention.id,
       activity_type: 'Mention',
       account_id: self.account.id,
       from_account_id: bot_account.id,

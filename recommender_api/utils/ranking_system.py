@@ -1,11 +1,7 @@
 from .tfidf import TFIDFRecommender
 import pandas as pd
 import numpy as np
-from recommender_api.model.status_queries import (
-    get_status_with_tag_ids_and_stats_by_status_id,
-    get_status_stats_by_status_id,
-)
-
+from recommender_api.model.status_queries import get_status_with_tag_ids_and_stats_by_status_id
 from recommender_api.model.tag_queries import get_tags_by_account_id
 
 
@@ -89,14 +85,10 @@ class RankingSystem:
         print("Interaktion_weight:", interaction_weight)
 
         # Calculation of ranking score with a log function
-        ranking_score = interaction_weight * (
-            1 / (np.log(weight_for_time * (days_since_status_update + 1)))
-        )
+        ranking_score = interaction_weight * (1 / (np.log(weight_for_time * (days_since_status_update + 1))))
 
         # Flat boost for tags in account if the account has minimum one tag
-        if tag_ids_from_account and self.are_account_tags_in_status(
-            status, tag_ids_from_account
-        ):
+        if tag_ids_from_account and self.are_account_tags_in_status(status, tag_ids_from_account):
             ranking_score = ranking_score + boost_for_tags
             print("Status boosted because of tags in account.")
 
@@ -107,9 +99,7 @@ class RankingSystem:
         print("------- End calculating ranking score for status -------")
         return status
 
-    def sort_timeline(
-        self, account_id, status_ids, nlp_model_loader, number_of_recommendations=20
-    ):
+    def sort_timeline(self, account_id, status_ids, nlp_model_loader, number_of_recommendations=20):
         """Function to sort the timeline of a account by ranking score.
         param account_id: The id of the account.
         param status_ids: The ids of the statuses.
@@ -119,37 +109,31 @@ class RankingSystem:
         """
 
         # Mock Data
-        status_ids = [
+        """ status_ids = [
             "110589714508600527",
             "110594975367510259",
             "110595013146537691",
             "110611101938508635",
-        ]
+        ] """
 
         # Get statuses with tag ids and stats
         statuses_with_tag_ids_and_stats = [
-            get_status_with_tag_ids_and_stats_by_status_id(status_id)
-            for status_id in status_ids
+            get_status_with_tag_ids_and_stats_by_status_id(status_id) for status_id in status_ids
         ]
 
         # Set Limit of recommendations
-        statuses_with_tag_ids_and_stats = statuses_with_tag_ids_and_stats[
-            :number_of_recommendations
-        ]
+        statuses_with_tag_ids_and_stats = statuses_with_tag_ids_and_stats[:number_of_recommendations]
 
         # Get tag ids from account
         tag_ids_from_account = get_tags_by_account_id(account_id)
 
         # Calculate ranking score for each status
         ranked_statuses = [
-            self.calculate_ranking_score(status, tag_ids_from_account)
-            for status in statuses_with_tag_ids_and_stats
+            self.calculate_ranking_score(status, tag_ids_from_account) for status in statuses_with_tag_ids_and_stats
         ]
 
         # Sort statuses by ranking score
-        sorted_statuses = sorted(
-            ranked_statuses, key=lambda x: x["ranking_score"], reverse=True
-        )
+        sorted_statuses = sorted(ranked_statuses, key=lambda x: x["ranking_score"], reverse=True)
 
         # Get status ids from sorted statuses
         sorted_statuses_ids = [status["id"] for status in sorted_statuses]

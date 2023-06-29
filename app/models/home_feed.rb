@@ -17,14 +17,17 @@ class HomeFeed < Feed
     min_id   = min_id.to_i if min_id.present?
 
     if(recommendations)
+      #Rails.logger.debug(get_recommendations(limit, max_id, since_id, min_id))
       status = from_redis(limit, max_id, since_id, min_id)
     else
       status = from_redis(limit, max_id, since_id, min_id)
-      status.sort()
     end
 
-    # reorder
   end
 
+  def get_recommendations(limit, max_id = nil, since_id = nil, min_id = nil)
+    headers = { 'Content-Type': 'application/json' }
+    response = Net::HTTP.post(URI('http://localhost:5000/recommend-tfidf/account'), { "account_id" =>  @account.id, "number_of_recommendations" => 10 }.to_json, headers)
+  end
 
 end

@@ -538,6 +538,8 @@ class Status < ApplicationRecord
   end
 
   def allocate_interests
-    AllocateTagsJob.perform_later self.id
+    if Rails.env.development?
+         AllocateTagsJob.perform_later self.id
+    end
   end
 end

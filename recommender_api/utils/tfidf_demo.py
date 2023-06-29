@@ -93,6 +93,7 @@ def recommend_with_tfidf_for_account(account_id, nlp_model_loader, number_of_rec
     # get toots of user
     account_toots = get_account_toots(account_id)
     preprocessor = TextPreprocessor(nlp_model_loader)
+
     preprocessed_account_toots = [preprocessor.sentence_preprocessing(sentence) for sentence in account_toots]
     # get accounts followed by the user and collect relevant toots
     followed_accounts = get_followed_accounts(account_id)

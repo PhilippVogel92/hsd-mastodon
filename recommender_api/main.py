@@ -14,5 +14,5 @@ app.register_blueprint(recommender_route)
 # cors = CORS(app)
 # app.config['CORS_HEADERS'] = 'Content-Type'
 if __name__ == '__main__':
-    get_google_trends()
+    #get_google_trends()
     app.run(host=os.getenv('FLASK_HOST'), port=os.getenv('FLASK_PORT'))

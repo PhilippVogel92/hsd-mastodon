@@ -108,13 +108,7 @@ class RankingSystem:
         return: A list of sorted status ids by ranking score.
         """
 
-        # Mock Data
-        """ status_ids = [
-            "110589714508600527",
-            "110594975367510259",
-            "110595013146537691",
-            "110611101938508635",
-        ] """
+        print(status_ids)
 
         # Get statuses with tag ids and stats
         statuses_with_tag_ids_and_stats = [
@@ -143,5 +137,5 @@ class RankingSystem:
         tfidf_recommender = TFIDFRecommender(number_of_recommendations, nlp_model_loader)
         recommendations_for_account = tfidf_recommender.recommend_statuses_from_follower(account_id)
         """
-
+        print(sorted_statuses_ids)
         return sorted_statuses_ids

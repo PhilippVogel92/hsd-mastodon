@@ -17,17 +17,18 @@ class HomeFeed < Feed
     min_id   = min_id.to_i if min_id.present?
 
     if(recommendations)
-      #Rails.logger.debug(get_recommendations(limit, max_id, since_id, min_id))
-      status = from_redis(limit, max_id, since_id, min_id)
+      status_ids = from_redis(limit, max_id, since_id, min_id).pluck(:id)
+      recommender_response = JSON.parse(get_recommendations(status_ids, limit, max_id, since_id, min_id).body)
+      ids = recommender_response.collect {|id| Status.find(id) }
     else
-      status = from_redis(limit, max_id, since_id, min_id)
+      status_ids = from_redis(limit, max_id, since_id, min_id)
     end
 
   end
 
-  def get_recommendations(limit, max_id = nil, since_id = nil, min_id = nil)
+  def get_recommendations(status_ids, limit, max_id = nil, since_id = nil, min_id = nil)
     headers = { 'Content-Type': 'application/json' }
-    response = Net::HTTP.post(URI('http://localhost:5000/recommend-tfidf/account'), { "account_id" =>  @account.id, "number_of_recommendations" => 10 }.to_json, headers)
+    response = Net::HTTP.post(URI('http://localhost:5000/create-sorted-timeline'), { "account_id" =>  @account.id, "status_ids": status_ids, "number_of_recommendations": 10 }.to_json, headers)
   end
 
 end

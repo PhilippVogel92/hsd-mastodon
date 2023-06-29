@@ -3,7 +3,7 @@ import spacy
 from sklearn.metrics.pairwise import cosine_similarity
 
 from .preprocessing import TextPreprocessor
-from recommender_api.model.mastodon_data import get_account_toots, get_followed_accounts
+from recommender_api.model.mastodon_data_local import get_account_toots, get_followed_accounts
 import numpy as np
 
 nlp = spacy.load("de_core_news_lg")

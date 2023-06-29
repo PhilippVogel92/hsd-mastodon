@@ -1,18 +1,20 @@
-import pandas as pd
 from .preprocessing import TextPreprocessor
-from ..model.mastodon_data_db import get_tags_by_toot_id, get_all_tags, persist_status_tag_relation
+from ..model.status_queries import persist_status_tag_relation
+from ..model.tag_queries import get_all_tags, get_tags_by_status_id
 
-class KeywordExtractor:
+
+class TagGenerator:
     """Class to extract keywords from a text and compare them with hashtags."""
-    def __init__(self, toot, nlp_model_loader, treshold=0.5):
-        self.nlp_model_loader = nlp_model_loader
-        self.nlp = self.choose_nlp_model(toot)
-        self.treshold = treshold
-        self.toot = toot
 
-    def choose_nlp_model(self, toot):
+    def __init__(self, status, nlp_model_loader, treshold=0.5):
+        self.nlp_model_loader = nlp_model_loader
+        self.nlp = self.choose_nlp_model(status)
+        self.treshold = treshold
+        self.status = status
+
+    def choose_nlp_model(self, status):
         """Function to choose the right NLP model."""
-        language = toot["language"]
+        language = status["language"]
         nlp_model = "de_core_news_lg"
         if language == "en":
             nlp_model = "en_core_web_lg"
@@ -30,20 +32,20 @@ class KeywordExtractor:
 
         # Extract keywords from text
         for token in doc:
-            if token.pos_ in ["VERB", "NOUN", "PROPN"]:
+            if token.pos_ in ["NOUN", "PROPN"]:  # ["VERB", "NOUN", "PROPN"]:
                 if token.text not in keywords:
                     keywords.append(token.text)
 
         return keywords
 
-    def match_hashtags_with_toot(self, hashtags):
+    def match_hashtags_with_status(self, hashtags):
         """Function to match hashtags with text."""
         matches = []
-        toot_text = self.toot["preprocessed_content"]
-        toot_id = self.toot["id"]
-        keywords = self.extract_keywords(toot_text)
-    
-        print("Input Text:", toot_text, "Keywords found:", keywords)
+        status_text = self.status["preprocessed_content"]
+        status_id = self.status["id"]
+        keywords = self.extract_keywords(status_text)
+
+        print("Input Text:", status_text, "Keywords found:", keywords)
         for keyword in keywords:
             keyword_doc = self.nlp(keyword.lower())
 
@@ -59,33 +61,33 @@ class KeywordExtractor:
                 if similarity >= self.treshold:
                     if hashtag_name not in matches:
                         matches.append(hashtag_name)
-                        persist_status_tag_relation(toot_id, hashtag_id)
+                        persist_status_tag_relation(status_id, hashtag_id)
 
         return matches
 
     def generate_hashtags(self):
-        """Function to generate hashtags for a toot."""   
-    
+        """Function to generate hashtags for a status."""
+
         # replace list with hashtags from database
         hashtags = get_all_tags()
 
-        toot_tags = get_tags_by_toot_id(self.toot["id"])
+        status_tags = get_tags_by_status_id(self.status["id"])
 
-        hashtags = [hashtag for hashtag in hashtags if hashtag[0] not in toot_tags]
+        hashtags = [hashtag for hashtag in hashtags if hashtag[0] not in status_tags]
 
         # initialize text preprocessor
         nlp_model_name = self.nlp.meta["lang"] + "_" + self.nlp.meta["name"]
         text_preprocessor = TextPreprocessor(self.nlp_model_loader, nlp_model_name)
 
         # preprocess text and clean it from html tags, urls, newlines, etc.
-        self.toot["preprocessed_content"] = text_preprocessor.sentence_preprocessing(self.toot["text"])
-        print("Text:", self.toot["preprocessed_content"])
+        self.status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(self.status["text"])
+        print("Text:", self.status["preprocessed_content"])
 
         # extract keywords from text
-        tags = self.match_hashtags_with_toot(hashtags)
+        tags = self.match_hashtags_with_status(hashtags)
         print("Tags:", tags)
 
-        # add hashtags to toot
-        self.toot["tags"] = tags
+        # add hashtags to status
+        self.status["tags"] = tags
 
-        return self.toot
+        return self.status

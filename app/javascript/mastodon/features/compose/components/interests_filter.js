@@ -55,7 +55,7 @@ class InterestsFilter extends React.PureComponent {
   };
 
   handleChange = (e) => {
-    this.props.onChange(e.target.value.replace(' ', '_'));
+    this.props.onChange(e.target.value.replace(' ', '_').toLowerCase());
     this.debounceSearch();
   };
 

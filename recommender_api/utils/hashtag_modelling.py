@@ -32,7 +32,7 @@ class TagGenerator:
 
         # Extract keywords from text
         for token in doc:
-            if token.pos_ in ["VERB", "NOUN", "PROPN"]:
+            if token.pos_ in ["NOUN", "PROPN"]:  # ["VERB", "NOUN", "PROPN"]:
                 if token.text not in keywords:
                     keywords.append(token.text)
 

@@ -1,7 +1,7 @@
 from .preprocessing import TextPreprocessor
 from ..model.status_queries import persist_status_tag_relation
 from ..model.tag_queries import get_all_tags, get_tags_by_status_id
-
+from langdetect import detect
 
 class TagGenerator:
     """Class to extract keywords from a text and compare them with hashtags."""
@@ -14,7 +14,7 @@ class TagGenerator:
 
     def choose_nlp_model(self, status):
         """Function to choose the right NLP model."""
-        language = status["language"]
+        language = detect(status["text"])
         nlp_model = "de_core_news_lg"
         if language == "en":
             nlp_model = "en_core_web_lg"
@@ -48,7 +48,6 @@ class TagGenerator:
         print("Input Text:", status_text, "Keywords found:", keywords)
         for keyword in keywords:
             keyword_doc = self.nlp(keyword.lower())
-
             for hashtag in hashtags:
                 hashtag_id = hashtag[0]
                 hashtag_name = hashtag[1]
@@ -62,7 +61,6 @@ class TagGenerator:
                     if hashtag_name not in matches:
                         matches.append(hashtag_name)
                         persist_status_tag_relation(status_id, hashtag_id)
-
         return matches
 
     def generate_hashtags(self):

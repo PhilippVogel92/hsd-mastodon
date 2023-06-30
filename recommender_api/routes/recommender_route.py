@@ -38,8 +38,8 @@ def sort_timeline():
     recommendations = ranking_system.sort_timeline(
         user_input["account_id"],
         user_input["status_ids"],
+        user_input["ranking_score_treshold"],
         nlp_model_loader,
-        user_input["number_of_recommendations"],
     )
     return jsonify(recommendations)
 

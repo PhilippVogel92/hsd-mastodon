@@ -1,7 +1,10 @@
 from .preprocessing import TextPreprocessor
 from ..model.status_queries import persist_status_tag_relation
-from ..model.tag_queries import get_all_tags, get_tags_by_status_id
+from ..model.tag_queries import get_all_tags_with_name_and_id, get_tags_by_status_id
 from langdetect import detect
+from spacy.tokens import Doc
+import time
+
 
 class TagGenerator:
     """Class to extract keywords from a text and compare them with hashtags."""
@@ -32,7 +35,7 @@ class TagGenerator:
 
         # Extract keywords from text
         for token in doc:
-            if token.pos_ in ["NOUN", "PROPN"]:  # ["VERB", "NOUN", "PROPN"]:
+            if token.pos_ in ["VERB", "NOUN", "PROPN"]:
                 if token.text not in keywords:
                     keywords.append(token.text)
 
@@ -44,18 +47,21 @@ class TagGenerator:
         status_text = self.status["preprocessed_content"]
         status_id = self.status["id"]
         keywords = self.extract_keywords(status_text)
-
         print("Input Text:", status_text, "Keywords found:", keywords)
-        for keyword in keywords:
-            keyword_doc = self.nlp(keyword.lower())
-            for hashtag in hashtags:
-                hashtag_id = hashtag[0]
-                hashtag_name = hashtag[1]
-                hashtag_doc = self.nlp(hashtag_name.lower())
 
+        for keyword_doc in self.nlp.pipe(keywords):
+            for hashtag_doc, hashtag_id in self.nlp.pipe(hashtags, as_tuples=True):
+                hashtag_name = hashtag_doc.text
                 similarity = keyword_doc.similarity(hashtag_doc)
 
-                print("Schlagwort:", keyword, "  Hashtag:", hashtag_name, "  Ähnlichkeit:", similarity)
+                print(
+                    "Schlagwort:",
+                    keyword_doc.text,
+                    "  Hashtag:",
+                    hashtag_name,
+                    "  Ähnlichkeit:",
+                    similarity,
+                )
 
                 if similarity >= self.treshold:
                     if hashtag_name not in matches:
@@ -66,8 +72,11 @@ class TagGenerator:
     def generate_hashtags(self):
         """Function to generate hashtags for a status."""
 
-        # replace list with hashtags from database
-        hashtags = get_all_tags()
+        # timer which stops the second from start to end
+        start = time.time()
+
+        # get all hashtags from database
+        hashtags = get_all_tags_with_name_and_id()
 
         status_tags = get_tags_by_status_id(self.status["id"])
 
@@ -78,7 +87,9 @@ class TagGenerator:
         text_preprocessor = TextPreprocessor(self.nlp_model_loader, nlp_model_name)
 
         # preprocess text and clean it from html tags, urls, newlines, etc.
-        self.status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(self.status["text"])
+        self.status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(
+            self.status["text"]
+        )
         print("Text:", self.status["preprocessed_content"])
 
         # extract keywords from text
@@ -88,4 +99,7 @@ class TagGenerator:
         # add hashtags to status
         self.status["tags"] = tags
 
-        return self.status
+        end = time.time()
+        diff = end - start
+        print("------------Time Difference:", diff, "-----------------")
+        return self.status["tags"]

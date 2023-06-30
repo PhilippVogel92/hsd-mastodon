@@ -521,7 +521,7 @@ class Status extends ImmutablePureComponent {
                   {statusAvatar}
                 </div>
 
-                <DisplayName account={status.get('account')} /> {status.get('id')}
+                <DisplayName account={status.get('account')} />
               </a>
             </div>
 

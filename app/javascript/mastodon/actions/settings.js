@@ -1,7 +1,7 @@
 import api from '../api';
 import { debounce } from 'lodash';
 import { showAlertForError } from './alerts';
-import {expandHomeTimeline} from "./timelines";
+import {expandHomeTimeline, TIMELINE_CLEAR} from "./timelines";
 
 export const SETTING_CHANGE = 'SETTING_CHANGE';
 export const SETTING_SAVE   = 'SETTING_SAVE';
@@ -13,9 +13,14 @@ export function changeSetting(path, value) {
       path, 
       value,
     });
-    /*if(["home", "enable", "recommendations"].every(v => path.includes(v))) {
-      dispatch(expandHomeTimeline({}));
-    }*/
+    // reload timeline if recommender toggle was used
+    if(path.includes("home", "enable", "recommendations")) {
+      const timeline = "home";
+      // clear current statuses
+      dispatch({type: TIMELINE_CLEAR, timeline});
+      // import statuses with or without recommendations parameter
+      dispatch(expandHomeTimeline());
+    }
     dispatch(saveSettings());
   };
 }

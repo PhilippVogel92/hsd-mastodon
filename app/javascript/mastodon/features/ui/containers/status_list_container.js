@@ -18,12 +18,11 @@ const makeGetStatusIds = (pending = false) => createSelector([
     let showStatus    = true;
 
     if (statusForId.get('account') === me) return true;
-
     if (columnSettings.getIn(['shows', 'reblog']) === false) {
       showStatus = showStatus && statusForId.get('reblog') === null;
     }
-
     if (columnSettings.getIn(['shows', 'reply']) === false) {
+      console.log(statusForId.get('in_reply_to_id'), statusForId.get('id'))
       showStatus = showStatus && (statusForId.get('in_reply_to_id') === null || statusForId.get('in_reply_to_account_id') === me);
     }
 

@@ -90,6 +90,8 @@ class RankingSystem:
 
         print("Ranking_Score without tag boost:", ranking_score)
 
+        weight_for_similar_tags = 0
+
         if tag_ids_from_account:
             weight_for_similar_tags = self.count_account_tags_in_status(
                 status, tag_ids_from_account
@@ -144,14 +146,6 @@ class RankingSystem:
         param nlp_model_loader: The nlp model loader.
         return: A list of sorted status ids by ranking score.
         """
-
-        # Mock Data
-        """         status_ids = [
-            "110589714508600527",
-            "110594975367510259",
-            "110595013146537691",
-            "110611101938508635",
-        ] """
 
         # Get statuses with tag ids and stats
         statuses_with_tag_ids_and_stats = [

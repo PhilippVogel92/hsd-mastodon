@@ -22,7 +22,6 @@ import {
   deleteAnnouncement,
 } from './announcements';
 import { getLocale } from '../locales';
-import initialState from "../initial_state";
 
 const { messages } = getLocale();
 

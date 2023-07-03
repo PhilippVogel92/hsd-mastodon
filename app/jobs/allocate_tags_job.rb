@@ -2,10 +2,8 @@ class AllocateTagsJob < ApplicationJob
   queue_as :default
 
   def perform(status_id)
-    http = Net::HTTP.new("localhost", 5000)
-    http.use_ssl = false
-    request = Net::HTTP::Post.new("statuses/#{status_id}/generate-tags")
-    http.request(request)
+    headers = {'Content-Type': 'application/json'}
+    Net::HTTP.post(URI(ENV['RECOMMENDER_API_URL'] + "/statuses/#{status_id}/generate-tags"), nil, headers)
   end
 
   def max_attempts

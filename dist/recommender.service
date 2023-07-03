@@ -1,0 +1,14 @@
+[Unit]
+Description=Mastodon Recommender Service
+After=network.target
+
+[Service]
+Type=simple
+User=mastodon
+StandardOutput=journal
+WorkingDirectory=/home/mastodon/live/recommender_api
+Environment="PYTHONPATH=/home/mastodon/live"
+ExecStart=/home/mastodon/live/recommender_api/venv/bin/gunicorn -w 3 main:app
+
+[Install]
+WantedBy=multi-user.target

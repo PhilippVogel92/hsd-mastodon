@@ -3,6 +3,12 @@ import requests
 import pandas as pd
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+MASTODON_BASE_URL = os.getenv("MASTODON_BASE_URL")
+
 
 def load_test_data(filename, path):
     data = pd.read_csv(os.path.join(path, filename), sep=";")
@@ -25,18 +31,16 @@ def get_account_id(data):
 
 
 def get_account_toots(account_id):
-    instance = "mastodon.hosting.medien.hs-duesseldorf.de"
     path = f"api/v1/accounts/{account_id}/statuses/"
-    response = requests.get(url=f"https://{instance}/{path}")
+    response = requests.get(url=f"{MASTODON_BASE_URL}/{path}")
 
     df = pd.DataFrame(data=response.json())
     return df
 
 
 def get_followed_accounts(account_id):
-    instance = "mastodon.hosting.medien.hs-duesseldorf.de"
     path = f"api/v1/accounts/{account_id}/following"
-    response = requests.get(url=f"https://{instance}/{path}")
+    response = requests.get(url=f"{MASTODON_BASE_URL}/{path}")
 
     account_ids = pd.DataFrame(data=response.json()).id.to_list()
     return account_ids

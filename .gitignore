@@ -66,3 +66,6 @@ docker-compose.override.yml
 
 # Ignore pychache files
 __pycache__/
+
+# Ignore python virtual environments
+venv/

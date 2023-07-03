@@ -3,11 +3,16 @@ from functools import reduce
 import requests
 import json
 import pandas as pd
+from dotenv import load_dotenv
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
 from .preprocessing import TextPreprocessor
+
+load_dotenv()
+
+MASTODON_BASE_URL = os.getenv("MASTODON_BASE_URL")
 
 
 def get_account_id(data):
@@ -21,18 +26,16 @@ def get_account_id(data):
 
 
 def get_account_statuses(account_id):
-    instance = "mastodon.hosting.medien.hs-duesseldorf.de"
     path = f"api/v1/accounts/{account_id}/statuses/"
-    response = requests.get(url=f"https://{instance}/{path}")
+    response = requests.get(url=f"{MASTODON_BASE_URL}/{path}")
 
     df = pd.DataFrame(data=response.json())
     return df["content"].to_list() if len(df) > 0 else []
 
 
 def get_followed_accounts(account_id):
-    instance = "mastodon.hosting.medien.hs-duesseldorf.de"
     path = f"api/v1/accounts/{account_id}/following"
-    response = requests.get(url=f"https://{instance}/{path}")
+    response = requests.get(url=f"{MASTODON_BASE_URL}/{path}")
 
     account_ids = pd.DataFrame(data=response.json()).id.to_list()
     return account_ids

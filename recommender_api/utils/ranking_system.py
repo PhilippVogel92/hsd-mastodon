@@ -1,7 +1,9 @@
 from .tfidf import TFIDFRecommender
 import pandas as pd
 import numpy as np
-from recommender_api.model.status_queries import get_status_with_tag_ids_and_stats_by_status_id
+from recommender_api.model.status_queries import (
+    get_status_with_tag_ids_and_stats_by_status_id,
+)
 from recommender_api.model.tag_queries import get_tags_by_account_id
 
 
@@ -86,7 +88,9 @@ class RankingSystem:
         print("Interaktion_weight:", interaction_weight)
 
         # Calculation of ranking score with a log function
-        ranking_score = interaction_weight * (1 / (np.log(weight_for_time * (days_since_status_update + 1))))
+        ranking_score = interaction_weight * (
+            1 / (np.log(weight_for_time * (days_since_status_update + 1)))
+        )
 
         print("Ranking_Score without tag boost:", ranking_score)
 
@@ -149,7 +153,8 @@ class RankingSystem:
 
         # Get statuses with tag ids and stats
         statuses_with_tag_ids_and_stats = [
-            get_status_with_tag_ids_and_stats_by_status_id(status_id) for status_id in status_ids
+            get_status_with_tag_ids_and_stats_by_status_id(status_id)
+            for status_id in status_ids
         ]
 
         # Get tag ids from account
@@ -157,7 +162,8 @@ class RankingSystem:
 
         # Calculate ranking score for each status
         ranked_statuses = [
-            self.calculate_ranking_score(status, tag_ids_from_account) for status in statuses_with_tag_ids_and_stats
+            self.calculate_ranking_score(status, tag_ids_from_account)
+            for status in statuses_with_tag_ids_and_stats
         ]
 
         filtered_statuses = self.filter_statuses_by_treshold(

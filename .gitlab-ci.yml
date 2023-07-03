@@ -18,5 +18,5 @@ deploy:
   only:
     - main
   script:
-    - ssh $MASTODON_USER@$MASTODON_HOST '/root/scripts/update_mastodon.sh'
+    - ssh $MASTODON_USER@$MASTODON_HOST '/root/scripts/update_mastodon.sh && /root/scripts/update_recommender.sh'
 

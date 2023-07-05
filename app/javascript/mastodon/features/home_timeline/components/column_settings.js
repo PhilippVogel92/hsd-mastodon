@@ -15,10 +15,13 @@ class ColumnSettings extends React.PureComponent {
 
   render () {
     const { settings, onChange } = this.props;
-
     return (
       <div>
         <span className='column-settings__section'><FormattedMessage id='home.column_settings.basic' defaultMessage='Basic' /></span>
+
+        <div className='column-settings__row'>
+          <SettingToggle prefix='home_timeline' settings={settings} settingPath={['enable', 'recommendations']} onChange={onChange} label={<FormattedMessage id='home.column_settings.recommendations' defaultMessage='Recommendations' />} />
+        </div>
 
         <div className='column-settings__row'>
           <SettingToggle prefix='home_timeline' settings={settings} settingPath={['shows', 'reblog']} onChange={onChange} label={<FormattedMessage id='home.column_settings.show_reblogs' defaultMessage='Show boosts' />} />

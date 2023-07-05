@@ -466,20 +466,11 @@ class User < ApplicationRecord
   end
 
   def send_welcome_message
-    welcome_message = "@#{self.account.username} Willkommen an der HSD Mastodon-Instanz! 🎉 \n      
-Wir freuen uns, dich als Teil unserer Community begrüßen zu dürfen. Hier hast du die Möglichkeit, dich mit anderen Studierenden, Lehrenden und Mitarbeitern auszutauschen, Informationen zu teilen und spannende Diskussionen zu führen.\n
-Um bessere Vorschläge zu erhalten, kannst du auf der Startseite (https://mastodon.hosting.medien.hs-duesseldorf.de/start) deine Interessen angeben.\n
-Viel Spaß und eine tolle Zeit an der HSD Mastodon-Instanz! 😊"
-
     bot_account = Account.find_by(username: 'welcome_hsd_bot')
+    return if bot_account.nil?
 
-    status = Status.create(
-      account: bot_account,
-      text: welcome_message,
-      visibility: 'direct'
-    )
-
-    status.save!
+    status = Status.find_by(id: I18n.locale.to_s == 'de' ? 110660594455415997 : 110660604509709680)
+    return if status.nil?
 
     mention = Mention.create(
       status_id: status.id,

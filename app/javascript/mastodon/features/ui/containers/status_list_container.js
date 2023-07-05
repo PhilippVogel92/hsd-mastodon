@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import StatusList from '../../../components/status_list';
-import { scrollTopTimeline, loadPending } from '../../../actions/timelines';
+import {scrollTopTimeline, loadPending} from '../../../actions/timelines';
 import { Map as ImmutableMap, List as ImmutableList } from 'immutable';
 import { createSelector } from 'reselect';
 import { debounce } from 'lodash';
@@ -18,11 +18,9 @@ const makeGetStatusIds = (pending = false) => createSelector([
     let showStatus    = true;
 
     if (statusForId.get('account') === me) return true;
-
     if (columnSettings.getIn(['shows', 'reblog']) === false) {
       showStatus = showStatus && statusForId.get('reblog') === null;
     }
-
     if (columnSettings.getIn(['shows', 'reply']) === false) {
       showStatus = showStatus && (statusForId.get('in_reply_to_id') === null || statusForId.get('in_reply_to_account_id') === me);
     }

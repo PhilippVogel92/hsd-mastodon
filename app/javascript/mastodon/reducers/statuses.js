@@ -24,8 +24,8 @@ import { Map as ImmutableMap, fromJS } from 'immutable';
 
 const importStatus = (state, status) => state.set(status.id, fromJS(status));
 
-const importStatuses = (state, statuses) =>
-  state.withMutations(mutable => statuses.forEach(status => importStatus(mutable, status)));
+const importStatuses = (state, statuses) => state.withMutations(mutable => statuses.forEach(status => importStatus(mutable, status)));
+
 
 const deleteStatus = (state, id, references) => {
   references.forEach(ref => {

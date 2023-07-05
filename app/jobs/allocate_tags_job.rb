@@ -3,7 +3,7 @@ class AllocateTagsJob < ApplicationJob
 
   def perform(status_id)
     headers = {'Content-Type': 'application/json'}
-    Net::HTTP.post(URI(ENV['RECOMMENDER_API_URL'] + "/statuses/#{status_id}/generate-tags"), nil, headers)
+    Net::HTTP.post(URI(ENV['RECOMMENDER_URL'] + "/statuses/#{status_id}/generate-tags"), nil, headers)
   end
 
   def max_attempts

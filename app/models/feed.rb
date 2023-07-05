@@ -30,7 +30,20 @@ class Feed
     Status.where(id: unhydrated).cache_ids
   end
 
+  def from_redis_recommender(limit, max_id, since_id, min_id)
+    max_id = redis.hget(key_recommender, 'max_id').to_i if max_id.present?
+    since_id = redis.hget(key_recommender, 'since_id').to_i if since_id.present?
+    statuses = from_redis(limit, max_id, since_id, min_id)
+    redis.hset(key_recommender, 'max_id', statuses.last.id) unless statuses.empty?
+    redis.hset(key_recommender, 'since_id', statuses.first.id) if max_id.blank? && since_id.blank?
+    statuses
+  end
+
   def key
     FeedManager.instance.key(@type, @id)
+  end
+
+  def key_recommender
+    FeedManager.instance.key(@type, @id, 'recommender')
   end
 end

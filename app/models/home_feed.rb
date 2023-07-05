@@ -17,7 +17,7 @@ class HomeFeed < Feed
     min_id   = min_id.to_i if min_id.present?
 
     if recommendations
-      status_ids = from_redis(limit, max_id, since_id, min_id).ids
+      status_ids = from_redis_recommender(limit, max_id, since_id, min_id).ids
       recommended_toots = get_recommendations(status_ids, limit, max_id, since_id, min_id)
       ids = recommended_toots.collect {|id| Status.find(id) }
     else

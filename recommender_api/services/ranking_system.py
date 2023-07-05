@@ -36,7 +36,6 @@ class RankingSystem:
         param account_id: The id of an account.
         return: True if the author of a status is in the account's following list, else False.
         """
-
         is_followed = False
         author_id = status["account_id"]
         if author_id in following_list:
@@ -201,6 +200,24 @@ class RankingSystem:
             if status["ranking_score"] > ranking_score_treshold
         ]
         return filtered_statuses
+    
+    def filter_statuses_by_account_diverstity(self, ranked_statuses, number_of_allowed_status_from_same_account):
+        """Function to filter out statuses from the same account if the number of statuses from the same account is higher than the allowed number.
+        param ranked_statuses: A list of statuses sorted by ranking score.
+        param number_of_allowed_status_from_same_account: The number of statuses from the same account that are allowed.
+        return: A list of statuses with ranking score."""
+        filtered_statuses = []
+        account_ids = []
+        for status in ranked_statuses:
+            if status["account_id"] not in account_ids:
+                filtered_statuses.append(status)
+                account_ids.append(status["account_id"])
+            elif account_ids.count(status["account_id"]) < number_of_allowed_status_from_same_account:
+                filtered_statuses.append(status)
+                account_ids.append(status["account_id"])
+
+        return filtered_statuses
+        
 
     def sort_statuses_by_ranking_score(self, statuses):
         """Function to sort statuses by ranking score.
@@ -212,9 +229,7 @@ class RankingSystem:
             statuses, key=lambda x: x["ranking_score"], reverse=True
         )
 
-        # Get status ids from sorted statuses
-        sorted_statuses_ids = [status["id"] for status in sorted_statuses]
-        return sorted_statuses_ids
+        return sorted_statuses
 
     def sort_timeline(
         self, account_id, status_ids, ranking_score_treshold
@@ -226,13 +241,14 @@ class RankingSystem:
         return: A list of sorted status ids by ranking score.
         """
         # Mock Data
-        status_ids = [
+        """ status_ids = [
             "110589714508600527",
             "110594975367510259",
             "110595013146537691",
             "110611101938508635",
-            "110656291168250243"
-        ]
+            "110656291168250243",
+            "110595029282400555",
+        ] """
 
         # Get statuses with tag ids and stats
         statuses_with_tag_ids_and_stats = [
@@ -258,6 +274,12 @@ class RankingSystem:
             ranked_statuses, ranking_score_treshold
         )
 
-        sorted_statuses_ids = self.sort_statuses_by_ranking_score(filtered_statuses)
+        # Sort statuses by ranking score
+        sorted_statuses = self.sort_statuses_by_ranking_score(filtered_statuses)
 
-        return sorted_statuses_ids
+        # Filter out statuses from the same account
+        recommended_statuses = self.filter_statuses_by_account_diverstity(sorted_statuses, 3)
+
+        recommended_statuses_ids = [status["id"] for status in recommended_statuses]
+
+        return recommended_statuses_ids

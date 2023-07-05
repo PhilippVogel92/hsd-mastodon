@@ -12,12 +12,15 @@ const initialState = ImmutableMap({
   saved: true,
 
   skinTone: 1,
-
+ 
   trends: ImmutableMap({
     show: true,
   }),
 
   home: ImmutableMap({
+    enable: {
+      recommendations: true,
+    },
     shows: ImmutableMap({
       reblog: true,
       reply: true,

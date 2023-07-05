@@ -126,6 +126,7 @@ const refreshHomeTimelineAndNotification = (dispatch, done) => {
 export const connectUserStream = () =>
   connectTimelineStream('home', 'user', {}, { fallback: refreshHomeTimelineAndNotification, fillGaps: fillHomeTimelineGaps });
 
+
 /**
  * @param {Object} options
  * @param {boolean} [options.onlyMedia]

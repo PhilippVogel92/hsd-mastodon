@@ -9,27 +9,27 @@ from recommender_api.model.account_queries import get_followed_accounts, get_blo
 
 class RankingSystem:
     """Class to create a ranking system for statuses and sort the timeline of an account."""
-    
+
     # if we might gain more users, we can scale the ranking score with this factor
     # low values cause higher variance on low interaction counts
-    scalibility_factor = 10.0
+    scalibility_factor = 1.0
 
     # interaction weights: set to whatever feels right. Will be normalized anyway ;)
-    replies_weight = 15.0
-    favourites_weight = 1.5
-    reblogs_weight = 2.0
-    
+    replies_weight = 3.0
+    favourites_weight = 2.0
+    reblogs_weight = 1.0
+
     # Not normalized. Higher values cause a higher loss in ranking score over time
     age_weight = 1.0
 
     # normalized interaction weights
-    comments_weight_normalized = 0.0
+    replies_weight_normalized = 0.0
     favourites_weight_normalized = 0.0
     boost_weight_normalized = 0.0
 
     # flat boosts added to ranking score, if they apply
     boost_for_following = 0.2
-    boost_for_tags = 0.05
+    boost_for_tags = 0.2
     boost_for_blocked = -1000
 
     def __init__(self):
@@ -108,8 +108,10 @@ class RankingSystem:
                 return True
             else:
                 return False
-            
+
     def normalize_counts(self, count):
+        if count is None:
+          count = 0
         return 1 - (1 / (1 + np.log1p(count / self.scalibility_factor)))
 
     def normalize_age(self, count):
@@ -120,10 +122,10 @@ class RankingSystem:
         weight_sum = self.replies_weight + self.favourites_weight + self.reblogs_weight
 
         # Scale the values proportionally
-        self.comments_weight_normalized = self.replies_weight / weight_sum
+        self.replies_weight_normalized = self.replies_weight / weight_sum
         self.favourites_weight_normalized = self.favourites_weight / weight_sum
         self.boost_weight_normalized = self.reblogs_weight / weight_sum
-        
+
     def calculate_ranking_score(self,
         status,
         tag_ids_from_account,
@@ -149,18 +151,21 @@ class RankingSystem:
 
         # calculate the time in days since the status was updated
         days_since_status_update = (pd.Timestamp.now() - updated_at).days
-        
+
         # maybe this can/should be done in __init__?
         self.normalize_interaction_weights()
-        
+
         # calculate weighted interaction subscores
-        replies_score = self.normalize_counts(replies_count) * self.comments_weight_normalized
+        replies_score = self.normalize_counts(replies_count) * self.replies_weight_normalized
         favourites_score = self.normalize_counts(favourites_count) * self.favourites_weight_normalized
         reblogs_score = self.normalize_counts(reblogs_count) * self.boost_weight_normalized
-        
+
         # calculate ranking score based on weighted interactions
         ranking_score = replies_score + favourites_score + reblogs_score
-        
+
+        print("Reply Score:", replies_score)
+        print("Reblog Score:", reblogs_score)
+        print("Favourites Score:", favourites_score)
         # add boost if status contains followed hashtags
         if tag_ids_from_account:
             ranking_score += self.count_account_tags_in_status(status, tag_ids_from_account) * self.boost_for_tags
@@ -168,21 +173,22 @@ class RankingSystem:
         # add boost if user follows th status author
         if self.check_if_author_is_followed(status, following_list):
             ranking_score += self.boost_for_following
-        
+
         # surpress blocked or muted authors
         if self.check_if_author_is_blocked(status, blocked_list) or self.check_if_author_is_muted(status, muted_list):
             ranking_score += self.boost_for_blocked
-        
+
         # calculate age score
         age_score = self.normalize_age(days_since_status_update)
 
         # calculate final ranking score based on age of the status
         ranking_score = ranking_score * age_score
-        
+
         # Add ranking score to status
         status["ranking_score"] = ranking_score
-        
-        return status    
+        print("Status with ranking score:", status)
+
+        return status
 
     def calculate_ranking_score_old(
         self,
@@ -292,7 +298,7 @@ class RankingSystem:
         """
         filtered_statuses = [status for status in ranked_statuses if status["ranking_score"] > ranking_score_treshold]
         return filtered_statuses
-    
+
     def filter_statuses_by_account_diverstity(self, ranked_statuses, number_of_allowed_status_from_same_account):
         """Function to filter out statuses from the same account if the number of statuses from the same account is higher than the allowed number.
         param ranked_statuses: A list of statuses sorted by ranking score.
@@ -309,7 +315,7 @@ class RankingSystem:
                 account_ids.append(status["account_id"])
 
         return filtered_statuses
-        
+
 
     def sort_statuses_by_ranking_score(self, statuses):
         """Function to sort statuses by ranking score.

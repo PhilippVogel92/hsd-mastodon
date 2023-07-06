@@ -54,15 +54,6 @@ class TagGenerator:
                 hashtag_name = hashtag_doc.text
                 similarity = keyword_doc.similarity(hashtag_doc)
 
-                print(
-                    "Schlagwort:",
-                    keyword_doc.text,
-                    "  Hashtag:",
-                    hashtag_name,
-                    "  Ähnlichkeit:",
-                    similarity,
-                )
-
                 if similarity >= self.treshold:
                     if hashtag_name not in matches:
                         matches.append(hashtag_name)

@@ -27,6 +27,8 @@ def sort_timeline(account_id):
 @recommender_route.route("/statuses/<status_id>/generate-tags", methods=["POST"])
 def generate_tag_for_status(status_id):
     status = get_status_by_id(status_id)
-    tag_generator = TagGenerator(status, nlp_model_loader)
-    status_with_tag = tag_generator.generate_hashtags()
-    return jsonify(status_with_tag)
+    if status["local"]:
+        tag_generator = TagGenerator(status, nlp_model_loader)
+        status_with_tag = tag_generator.generate_hashtags()
+        return jsonify(status_with_tag)
+    return jsonify(status)

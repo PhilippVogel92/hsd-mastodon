@@ -28,7 +28,7 @@ class HomeFeed < Feed
 
   def get_recommendations(status_ids, limit, max_id = nil, since_id = nil, min_id = nil)
     headers = { 'Content-Type': 'application/json' }
-    response = Net::HTTP.post(URI(ENV["RECOMMENDER_URL"] + "accounts/#{@account.id}/create-sorted-timeline"), { "status_ids": status_ids, "ranking_score_treshold": 0.1 }.to_json, headers)
+    response = Net::HTTP.post(URI(ENV["RECOMMENDER_URL"] + "accounts/#{@account.id}/create-sorted-timeline"), { "status_ids": status_ids}.to_json, headers)
     JSON.parse(response.body)
   end
 

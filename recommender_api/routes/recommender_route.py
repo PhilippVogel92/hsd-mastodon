@@ -20,7 +20,6 @@ def sort_timeline(account_id):
     recommendations = ranking_system.sort_timeline(
         account_id,
         user_input["status_ids"],
-        user_input["ranking_score_treshold"],
     )
     return jsonify(recommendations)
 
@@ -31,4 +30,3 @@ def generate_tag_for_status(status_id):
     tag_generator = TagGenerator(status, nlp_model_loader)
     status_with_tag = tag_generator.generate_hashtags()
     return jsonify(status_with_tag)
-

@@ -20,7 +20,7 @@ class RankingSystem:
     reblogs_weight = 1.0
 
     # Not normalized. Higher values cause a higher loss in ranking score over time
-    age_weight = 1.0
+    age_weight = 0.3
 
     # normalized interaction weights
     replies_weight_normalized = 0.0

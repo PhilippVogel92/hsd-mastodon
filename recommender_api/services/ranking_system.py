@@ -101,20 +101,6 @@ class RankingSystem:
 
         return is_muted
 
-    def check_if_author_is_already_in_list(self, status, statuses_list):
-        """
-        Function to check if the author of a post is already in an other post of the statuses list.
-        param status: A specific status by id with joined tag_id and stats.
-        param statuses_list: A list of statuses.
-        return: True if the author of a post is already in an other post of the statuses list, else False.
-        """
-        author_id = status["author_id"]
-        for status in statuses_list:
-            if author_id == status["author_id"]:
-                return True
-            else:
-                return False
-
     def normalize_counts(self, count):
         if count is None:
             count = 0

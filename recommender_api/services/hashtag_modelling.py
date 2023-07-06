@@ -25,6 +25,11 @@ class TagGenerator:
 
         nlp = self.nlp_model_loader.get_model(nlp_model)
         print("Loaded NLP model:", nlp.meta["lang"] + "_" + nlp.meta["name"])
+        # safe all print statements in a file
+        with open("log_hashtag_modelling.txt", "a") as f:
+            print(
+                "Loaded NLP model:", nlp.meta["lang"] + "_" + nlp.meta["name"], "for Status:", status["text"], file=f
+            )
         return nlp
 
     def extract_keywords(self, text):

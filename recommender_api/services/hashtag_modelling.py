@@ -78,19 +78,24 @@ class TagGenerator:
         text_preprocessor = TextPreprocessor(self.nlp_model_loader, nlp_model_name)
 
         # preprocess text and clean it from html tags, urls, newlines, etc.
-        self.status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(
-            self.status["text"]
-        )
+        self.status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(self.status["text"])
         print("Text:", self.status["preprocessed_content"])
 
         # extract keywords from text
         tags = self.match_hashtags_with_status(hashtags)
-        print("Tags:", tags)
 
         # add hashtags to status
         self.status["tags"] = tags
 
         end = time.time()
         diff = end - start
-        print("------------Time Difference:", diff, "-----------------")
+        print(
+            "------------Zeitaufwand:",
+            diff,
+            "für Status:",
+            self.status["text"],
+            ". Gefundene Tags:",
+            self.status["tags"],
+            "-----------------",
+        )
         return self.status["tags"]

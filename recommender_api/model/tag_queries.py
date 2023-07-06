@@ -1,5 +1,5 @@
 from .db_connection import conn
-
+import psycopg2
 
 def get_all_tags_with_id_and_name():
     """
@@ -7,10 +7,13 @@ def get_all_tags_with_id_and_name():
 
     return: A list of all tags.
     """
-    cur = conn.cursor()
-    cur.execute("SELECT id, name, display_name FROM tags;")
-    tags = cur.fetchall()
-    cur.close()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT id, name, display_name FROM tags;")
+        tags = cur.fetchall()
+        cur.close()
+    except psycopg2.DatabaseError as error:
+        print(error)
     return [tag[0:3] for tag in tags]
 
 def get_all_tags_with_name_and_id():
@@ -19,10 +22,13 @@ def get_all_tags_with_name_and_id():
 
     return: A list of all tags.
     """
-    cur = conn.cursor()
-    cur.execute("SELECT name, id FROM tags;")
-    tags = cur.fetchall()
-    cur.close()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT name, id FROM tags;")
+        tags = cur.fetchall()
+        cur.close()
+    except psycopg2.DatabaseError as error:
+        print(error)
     return [tag[0:2] for tag in tags]
 
 
@@ -33,10 +39,13 @@ def get_tags_by_status_id(status_id):
     param status_id: The id of the status.
     return: A list of all tags.
     """
-    cur = conn.cursor()
-    cur.execute("SELECT tag_id FROM statuses_tags WHERE status_id = %s;", (status_id,))
-    tags = cur.fetchall()
-    cur.close()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT tag_id FROM statuses_tags WHERE status_id = %s;", (status_id,))
+        tags = cur.fetchall()
+        cur.close()
+    except psycopg2.DatabaseError as error:
+        print(error)
     return [tag[0] for tag in tags]
 
 
@@ -47,8 +56,11 @@ def get_tags_by_account_id(account_id):
     param account_id: The id of the account.
     return: A list of all tags.
     """
-    cur = conn.cursor()
-    cur.execute("SELECT tag_id FROM tag_follows WHERE account_id = %s;", (account_id,))
-    tags = cur.fetchall()
-    cur.close()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT tag_id FROM tag_follows WHERE account_id = %s;", (account_id,))
+        tags = cur.fetchall()
+        cur.close()
+    except psycopg2.DatabaseError as error:
+        print(error)
     return [tag[0] for tag in tags]

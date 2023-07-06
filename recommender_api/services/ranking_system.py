@@ -32,6 +32,12 @@ class RankingSystem:
     boost_for_tags = 0.2
     boost_for_blocked = -1000
 
+    # number of allowed statuses from the same account in the timeline, more than that will be removed
+    number_of_allowed_status_from_same_account = 3
+
+    # threshold for ranking score. If a status has a lower score, it will be removed from the timeline
+    ranking_score_threshold = 0.1
+
     def __init__(self):
         pass
 
@@ -111,7 +117,7 @@ class RankingSystem:
 
     def normalize_counts(self, count):
         if count is None:
-          count = 0
+            count = 0
         return 1 - (1 / (1 + np.log1p(count / self.scalibility_factor)))
 
     def normalize_age(self, count):
@@ -126,7 +132,8 @@ class RankingSystem:
         self.favourites_weight_normalized = self.favourites_weight / weight_sum
         self.boost_weight_normalized = self.reblogs_weight / weight_sum
 
-    def calculate_ranking_score(self,
+    def calculate_ranking_score(
+        self,
         status,
         tag_ids_from_account,
         following_list,
@@ -163,9 +170,6 @@ class RankingSystem:
         # calculate ranking score based on weighted interactions
         ranking_score = replies_score + favourites_score + reblogs_score
 
-        print("Reply Score:", replies_score)
-        print("Reblog Score:", reblogs_score)
-        print("Favourites Score:", favourites_score)
         # add boost if status contains followed hashtags
         if tag_ids_from_account:
             ranking_score += self.count_account_tags_in_status(status, tag_ids_from_account) * self.boost_for_tags
@@ -186,117 +190,16 @@ class RankingSystem:
 
         # Add ranking score to status
         status["ranking_score"] = ranking_score
-        print("Status with ranking score:", status)
 
         return status
 
-    def calculate_ranking_score_old(
-        self,
-        status,
-        tag_ids_from_account,
-        following_list,
-        muted_list,
-        blocked_list,
-        weight_for_favourites_count=1.5,
-        weight_for_replies_count=15.0,
-        weight_for_reblogs_count=2.0,
-        weight_for_time=1.1,
-        boost_for_tags=100,
-    ):
-        """
-        Function to calculate the ranking score of a status.
-
-        :param status: A specific status by id with joined tag_id and stats.
-        :param weight_for_favourites_count: Weight for favourites count.
-        :param weight_for_replies_count: Weight for replies count.
-        :param weight_for_reblogs_count: Weight for reblogs count.
-        :param weight_for_time: Weight for time.
-        :return: A specific status with a ranking score.
-        """
-
-        favourites_count = status["favourites_count"]
-        replies_count = status["replies_count"]
-        reblogs_count = status["reblogs_count"]
-        updated_at = status["updated_at"]
-
-        # calculate the time in days since the status was updated
-        days_since_status_update = (pd.Timestamp.now() - updated_at).days
-
-        # Logging for debugging
-        print(
-            "------- Start calculating ranking score for status:",
-            status["id"],
-            "-------",
-        )
-        print("Days since status update:", days_since_status_update)
-        print("Favourites count:", favourites_count)
-        print("Replies count:", replies_count)
-        print("Reblogs count:", reblogs_count)
-        print("Tags in account:", tag_ids_from_account)
-        print("Tags in status:", status["tag_ids"])
-
-        # Set interaction weight to 1 as default
-        interaction_weight = 1
-
-        # Check if the status has any interactions
-        if replies_count != None and reblogs_count != None and favourites_count != None:
-            # Prevent log(0) error
-            if replies_count != 0 or reblogs_count != 0 or favourites_count != 0:
-                interaction_weight = np.log(
-                    weight_for_replies_count * replies_count
-                    + weight_for_favourites_count * favourites_count
-                    + weight_for_reblogs_count * reblogs_count
-                )
-
-        print("Interaktion_weight:", interaction_weight)
-
-        # Calculation of ranking score with a log function
-        ranking_score = interaction_weight * (1 / (np.log(weight_for_time * (days_since_status_update + 1))))
-
-        print("Ranking_Score without tag boost:", ranking_score)
-
-        # set weight for similar tags
-        weight_for_similar_tags = 0
-
-        if tag_ids_from_account:
-            weight_for_similar_tags = self.count_account_tags_in_status(status, tag_ids_from_account)
-
-        print("Weight for tag boost:", weight_for_similar_tags)
-
-        # set boost for following/blocked/muted author
-        boost_for_follower = 0
-        boost_for_blocked = 0
-        boost_for_muted = 0
-
-        if self.check_if_author_is_followed(status, following_list):
-            boost_for_follower = 30
-
-        if self.check_if_author_is_blocked(status, blocked_list) or self.check_if_author_is_muted(status, muted_list):
-            boost_for_blocked = -1000
-
-        # Flat boost for tags in account if the account has minimum one tag
-        ranking_score = (
-            ranking_score
-            + (weight_for_similar_tags * boost_for_tags)
-            + boost_for_follower
-            + boost_for_blocked
-            + boost_for_muted
-        )
-
-        # Add ranking score to status
-        status["ranking_score"] = ranking_score
-
-        print("Status with ranking score:", status)
-        print("------- End calculating ranking score for status -------")
-        return status
-
-    def filter_statuses_by_treshold(self, ranked_statuses, ranking_score_treshold):
-        """Function to filter out statuses with a lower ranking score than the treshold.
+    def filter_statuses_by_threshold(self, ranked_statuses, ranking_score_threshold):
+        """Function to filter out statuses with a lower ranking score than the threshold.
         param ranked_statuses: A list of statuses with ranking score.
-        param ranking_score_treshold: The threshold for the ranking score. Statuses with a lower ranking score will be filtered out.
-        return: A list of statuses with ranking score higher than the treshold.
+        param ranking_score_threshold: The threshold for the ranking score. Statuses with a lower ranking score will be filtered out.
+        return: A list of statuses with ranking score higher than the threshold.
         """
-        filtered_statuses = [status for status in ranked_statuses if status["ranking_score"] > ranking_score_treshold]
+        filtered_statuses = [status for status in ranked_statuses if status["ranking_score"] > ranking_score_threshold]
         return filtered_statuses
 
     def filter_statuses_by_account_diverstity(self, ranked_statuses, number_of_allowed_status_from_same_account):
@@ -316,7 +219,6 @@ class RankingSystem:
 
         return filtered_statuses
 
-
     def sort_statuses_by_ranking_score(self, statuses):
         """Function to sort statuses by ranking score.
         param statuses: A list of statuses with ranking score.
@@ -327,11 +229,11 @@ class RankingSystem:
 
         return sorted_statuses
 
-    def sort_timeline(self, account_id, status_ids, ranking_score_treshold):
+    def sort_timeline(self, account_id, status_ids):
         """Function to sort the timeline of a account by ranking score.
         param account_id: The id of the account. The statuses will be sorted by the tags of the account.
         param status_ids: The ids of the statuses.
-        param ranking_score_treshold: The threshold for the ranking score. Statuses with a lower ranking score will be filtered out.
+        param ranking_score_threshold: The threshold for the ranking score. Statuses with a lower ranking score will be filtered out.
         return: A list of sorted status ids by ranking score.
         """
 
@@ -354,7 +256,6 @@ class RankingSystem:
         following_list = get_followed_accounts(account_id)
         muted_list = get_muted_accounts(account_id)
         blocked_list = get_blocked_accounts(account_id)
-        print("Blocked list:", blocked_list)
 
         # Calculate ranking score for each status
         ranked_statuses = [
@@ -362,13 +263,15 @@ class RankingSystem:
             for status in statuses_with_tag_ids_and_stats
         ]
 
-        filtered_statuses = self.filter_statuses_by_treshold(ranked_statuses, ranking_score_treshold)
+        filtered_statuses = self.filter_statuses_by_threshold(ranked_statuses, self.ranking_score_threshold)
 
         # Sort statuses by ranking score
         sorted_statuses = self.sort_statuses_by_ranking_score(filtered_statuses)
 
         # Filter out statuses from the same account
-        recommended_statuses = self.filter_statuses_by_account_diverstity(sorted_statuses, 3)
+        recommended_statuses = self.filter_statuses_by_account_diverstity(
+            sorted_statuses, self.number_of_allowed_status_from_same_account
+        )
 
         recommended_statuses_ids = [status["id"] for status in recommended_statuses]
 

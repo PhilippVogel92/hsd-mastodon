@@ -43,7 +43,7 @@ class TagGenerator:
                 "NLP Model:",
                 self.nlp.meta["lang"] + "_" + self.nlp.meta["name"],
                 doc.text,
-                [(token.text, token.pos) for token in doc],
+                [(token.text, token.pos_) for token in doc],
                 file=f,
             )
 

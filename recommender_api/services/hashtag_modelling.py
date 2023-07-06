@@ -2,14 +2,13 @@ from .preprocessing import TextPreprocessor
 from ..model.status_queries import persist_status_tag_relation
 from ..model.tag_queries import get_all_tags_with_name_and_id, get_tags_by_status_id
 from langdetect import detect
-from spacy.tokens import Doc
 import time
 
 
 class TagGenerator:
     """Class to extract keywords from a text and compare them with hashtags."""
 
-    def __init__(self, status, nlp_model_loader, treshold=0.5):
+    def __init__(self, status, nlp_model_loader, treshold=0.7):
         self.nlp_model_loader = nlp_model_loader
         self.nlp = self.choose_nlp_model(status)
         self.treshold = treshold
@@ -21,15 +20,10 @@ class TagGenerator:
         nlp_model = "de_core_news_lg"
         if language == "en":
             nlp_model = "en_core_web_lg"
-            print("English language detected.")
 
         nlp = self.nlp_model_loader.get_model(nlp_model)
         print("Loaded NLP model:", nlp.meta["lang"] + "_" + nlp.meta["name"])
         # safe all print statements in a file
-        with open("log_hashtag_modelling.txt", "a") as f:
-            print(
-                "Loaded NLP model:", nlp.meta["lang"] + "_" + nlp.meta["name"], "for Status:", status["text"], file=f
-            )
         return nlp
 
     def extract_keywords(self, text):
@@ -43,6 +37,15 @@ class TagGenerator:
             if token.pos_ in ["VERB", "NOUN", "PROPN"]:
                 if token.text not in keywords:
                     keywords.append(token.text)
+        # print nlp model name in log file
+        with open("log_hashtag_modelling.txt", "a") as f:
+            print(
+                "NLP Model:",
+                self.nlp.meta["lang"] + "_" + self.nlp.meta["name"],
+                doc.text,
+                [(token.text, token.pos) for token in doc],
+                file=f,
+            )
 
         return keywords
 

@@ -98,4 +98,21 @@ class TagGenerator:
             self.status["tags"],
             "-----------------",
         )
+        # safe all print statements in a file
+        with open("log_hashtag_modelling.txt", "a") as f:
+            print(
+                "Zeitaufwand:",
+                diff,
+                "/ Status:",
+                self.status["text"],
+                "/ Preprocessed Text:",
+                self.status["preprocessed_content"],
+                "/ Keywords:",
+                self.extract_keywords(self.status["preprocessed_content"]),
+                "/ Gefundene Tags:",
+                self.status["tags"],
+                "-----------------",
+                file=f,
+            )
+
         return self.status["tags"]

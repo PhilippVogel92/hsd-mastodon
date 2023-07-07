@@ -47,7 +47,7 @@ class TagGenerator:
                 file=f,
             )
 
-        return keywords
+        return keywords.lower()
 
     def match_hashtags_with_status(self, hashtags):
         """Function to match hashtags with text."""
@@ -61,7 +61,7 @@ class TagGenerator:
             for hashtag_doc, hashtag_id in self.nlp.pipe(hashtags, as_tuples=True):
                 hashtag_name = hashtag_doc.text
                 similarity = keyword_doc.similarity(hashtag_doc)
-
+                print("Keyword:", keyword_doc.text, "Hashtag:", hashtag_doc.text, "Similarity:", similarity)
                 if similarity >= self.treshold:
                     if hashtag_name not in matches:
                         matches.append(hashtag_name)

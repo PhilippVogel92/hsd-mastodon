@@ -223,15 +223,6 @@ class RankingSystem:
         return: A list of sorted status ids by ranking score.
         """
 
-        # Mock Data
-        """ status_ids = [
-            "110589714508600527",
-            "110594975367510259",
-            "110595013146537691",
-            "110611101938508635",
-            "110656291168250243"
-        ] """
-
         # Get statuses with tag ids and stats
         statuses_with_tag_ids_and_stats = [
             get_status_with_tag_ids_and_stats_by_status_id(status_id) for status_id in status_ids

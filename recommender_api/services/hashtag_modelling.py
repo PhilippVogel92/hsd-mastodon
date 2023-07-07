@@ -8,7 +8,7 @@ import time
 class TagGenerator:
     """Class to extract keywords from a text and compare them with hashtags."""
 
-    def __init__(self, status, nlp_model_loader, treshold=0.7):
+    def __init__(self, status, nlp_model_loader, treshold=0.6):
         self.nlp_model_loader = nlp_model_loader
         self.nlp = self.choose_nlp_model(status)
         self.treshold = treshold

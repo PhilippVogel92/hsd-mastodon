@@ -58,7 +58,7 @@ class TagGenerator:
         print("Input Text:", status_text, "Keywords found:", keywords)
 
         for keyword_doc in self.nlp.pipe(keywords):
-            for hashtag_doc, hashtag_id in self.nlp.pipe(hashtags, batch_size = 500, as_tuples=True):
+            for hashtag_doc, hashtag_id in self.nlp.pipe(hashtags, as_tuples=True):
                 hashtag_name = hashtag_doc.text
                 similarity = keyword_doc.similarity(hashtag_doc)
                 if similarity >= self.treshold:
@@ -70,6 +70,13 @@ class TagGenerator:
     def generate_hashtags(self):
         """Function to generate hashtags for a status."""
 
+        # statuses from other instances should not be processed
+        if not self.status["local"]:
+            return self.status
+
+        with open("log_hashtag_modelling.txt", "a") as f:
+            print("Triggered hashtag modelling for status:", self.status["id"], file=f)
+            
         # timer which stops the second from start to end
         start = time.time()
 

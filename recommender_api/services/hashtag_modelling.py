@@ -36,7 +36,7 @@ class TagGenerator:
         for token in doc:
             if token.pos_ in ["VERB", "NOUN", "PROPN"]:
                 if token.text not in keywords:
-                    keywords.append(token.text)
+                    keywords.append(token.text.lower())
         # print nlp model name in log file
         with open("log_hashtag_modelling.txt", "a") as f:
             print(
@@ -47,7 +47,7 @@ class TagGenerator:
                 file=f,
             )
 
-        return keywords.lower()
+        return keywords
 
     def match_hashtags_with_status(self, hashtags):
         """Function to match hashtags with text."""

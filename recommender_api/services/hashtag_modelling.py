@@ -58,10 +58,9 @@ class TagGenerator:
         print("Input Text:", status_text, "Keywords found:", keywords)
 
         for keyword_doc in self.nlp.pipe(keywords):
-            for hashtag_doc, hashtag_id in self.nlp.pipe(hashtags, as_tuples=True):
+            for hashtag_doc, hashtag_id in self.nlp.pipe(hashtags, batch_size = 10000, as_tuples=True):
                 hashtag_name = hashtag_doc.text
                 similarity = keyword_doc.similarity(hashtag_doc)
-                print("Keyword:", keyword_doc.text, "Hashtag:", hashtag_doc.text, "Similarity:", similarity)
                 if similarity >= self.treshold:
                     if hashtag_name not in matches:
                         matches.append(hashtag_name)

@@ -13,7 +13,7 @@ echo "Updating the Recommmender API."
 # Updating Python dependencies
 pushd /home/mastodon/live/recommender_api
 source "./venv/bin/activate"
-pip install -r requirements.txt
+pip install -r requirements.txt --no-cache-dir
 deactivate
 popd
 

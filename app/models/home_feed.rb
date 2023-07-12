@@ -10,25 +10,59 @@ class HomeFeed < Feed
     redis.exists?("account:#{@account.id}:regeneration")
   end
 
-  def get(limit, max_id = nil, since_id = nil, min_id = nil, recommendations = false)
+  def get(limit, max_id = nil, since_id = nil, min_id = nil, recommendations = false, status_count = nil)
     limit    = limit.to_i
     max_id   = max_id.to_i if max_id.present?
     since_id = since_id.to_i if since_id.present?
     min_id   = min_id.to_i if min_id.present?
+    status_count   = status_count.to_i if status_count.present?
 
     if recommendations
-      status_ids = from_redis(limit, max_id, since_id, min_id).ids
-      recommended_toots = get_recommendations(status_ids, limit, max_id, since_id, min_id)
-      ids = recommended_toots.collect {|id| Status.find(id) }
+      from_redis_recommender(limit, max_id, since_id, status_count)
     else
-      status_ids = from_redis(limit, max_id, since_id, min_id)
+      from_redis(limit, max_id, since_id, min_id)
     end
-
   end
 
-  def get_recommendations(status_ids, limit, max_id = nil, since_id = nil, min_id = nil)
+  def from_redis_recommender(limit, max_id, since_id, status_count)
+    recommender_feed_key = key_recommender
+    recommender_feed_recalculate_key = key_recommender('recalculate')
+    if !redis.exists(recommender_feed_recalculate_key).zero? || redis.exists(recommender_feed_key).zero?
+      home_feed_ids = redis.zrevrangebyscore(key, '(+inf', '(-inf').map(&:to_i)
+      recommended_toots = get_recommendations(home_feed_ids)
+      redis.del(recommender_feed_recalculate_key)
+      return [] if recommended_toots.empty?
+      redis.ltrim(recommender_feed_key, 1, 0)
+      redis.rpush(recommender_feed_key, recommended_toots)
+      status_ids = recommended_toots.take(limit)
+    else
+      if max_id.present?
+        start_pos = status_count
+        end_pos = start_pos + limit - 1
+      elsif since_id.present?
+        recommender_feed_len = redis.llen(recommender_feed_key)
+        start_pos = 0
+        return [] if (recommender_feed_len - status_count).zero?
+        end_pos = recommender_feed_len - status_count - 1
+        end_pos = limit - 1 if end_pos > limit - 1
+      else
+        start_pos = 0
+        end_pos = limit - 1
+      end
+      status_ids = redis.lrange(recommender_feed_key, start_pos, end_pos).map(&:to_i)
+    end
+    Status.where(id: status_ids).sort_by { |status| status_ids.index(status.id) }
+  end
+
+  def key_recommender(subtype = nil)
+    return FeedManager.instance.key(@type, @id, 'recommender') unless subtype
+
+    FeedManager.instance.key(@type, @id, "recommender:#{subtype}")
+  end
+
+  def get_recommendations(status_ids)
     headers = { 'Content-Type': 'application/json' }
-    response = Net::HTTP.post(URI(ENV["RECOMMENDER_URL"] + "accounts/#{@account.id}/create-sorted-timeline"), { "status_ids": status_ids}.to_json, headers)
+    response = Net::HTTP.post(URI(ENV['RECOMMENDER_URL'] + "accounts/#{@account.id}/create-sorted-timeline"), { "status_ids": status_ids}.to_json, headers)
     JSON.parse(response.body)
   end
 

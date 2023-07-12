@@ -30,7 +30,8 @@ class Api::V1::Timelines::HomeController < Api::BaseController
       params[:max_id],
       params[:since_id],
       params[:min_id],
-      params[:recommendations]
+      params[:recommendations],
+      params[:status_count]
     )
   end
 

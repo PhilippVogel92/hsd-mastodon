@@ -112,6 +112,7 @@ export function expandTimeline(timelineId, path, params = {}, done = noOp) {
 
     if(recommendationsEnabled && timelineId === 'home') {
       params.recommendations = true;
+      params.status_count = timeline.getIn(['items'])?.size || 0;
     }
 
     api(getState).get(path, {params}).then(response => {
@@ -147,18 +148,18 @@ export function fillTimelineGaps(timelineId, path, params = {}, done = noOp) {
 
 export const expandHomeTimeline = ({maxId} = {}, done = noOp) => expandTimeline('home', '/api/v1/timelines/home', {max_id: maxId}, done);
 export const expandPublicTimeline = ({
-                                       maxId,
-                                       onlyMedia,
-                                       onlyRemote
-                                     } = {}, done = noOp) => expandTimeline(`public${onlyRemote ? ':remote' : ''}${onlyMedia ? ':media' : ''}`, '/api/v1/timelines/public', {
+  maxId,
+  onlyMedia,
+  onlyRemote
+} = {}, done = noOp) => expandTimeline(`public${onlyRemote ? ':remote' : ''}${onlyMedia ? ':media' : ''}`, '/api/v1/timelines/public', {
   remote: !!onlyRemote,
   max_id: maxId,
   only_media: !!onlyMedia
 }, done);
 export const expandCommunityTimeline = ({
-                                          maxId,
-                                          onlyMedia
-                                        } = {}, done = noOp) => expandTimeline(`community${onlyMedia ? ':media' : ''}`, '/api/v1/timelines/public', {
+  maxId,
+  onlyMedia
+} = {}, done = noOp) => expandTimeline(`community${onlyMedia ? ':media' : ''}`, '/api/v1/timelines/public', {
   local: true,
   max_id: maxId,
   only_media: !!onlyMedia

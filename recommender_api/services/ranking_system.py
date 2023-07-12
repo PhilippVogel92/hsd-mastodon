@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from collections import defaultdict
 from recommender_api.model.status_queries import (
     get_status_with_tag_ids_and_stats_by_status_id,
 )
@@ -36,7 +37,7 @@ class RankingSystem:
     number_of_allowed_status_from_same_account = 3
 
     # threshold for ranking score. If a status has a lower score, it will be removed from the timeline
-    ranking_score_threshold = 0.1
+    ranking_score_threshold = -1.0
 
     def __init__(self):
         pass
@@ -188,22 +189,25 @@ class RankingSystem:
         filtered_statuses = [status for status in ranked_statuses if status["ranking_score"] > ranking_score_threshold]
         return filtered_statuses
 
-    def filter_statuses_by_account_diverstity(self, ranked_statuses, number_of_allowed_status_from_same_account):
-        """Function to filter out statuses from the same account if the number of statuses from the same account is higher than the allowed number.
-        param ranked_statuses: A list of statuses sorted by ranking score.
+    def promote_author_diversity(self, statuses, number_of_allowed_status_from_same_account):
+        """Function to promote author diversity.
+        param statuses: A list of statuses with ranking score.
         param number_of_allowed_status_from_same_account: The number of statuses from the same account that are allowed.
         return: A list of statuses with ranking score."""
-        filtered_statuses = []
-        account_ids = []
-        for status in ranked_statuses:
-            if status["account_id"] not in account_ids:
-                filtered_statuses.append(status)
-                account_ids.append(status["account_id"])
-            elif account_ids.count(status["account_id"]) < number_of_allowed_status_from_same_account:
-                filtered_statuses.append(status)
-                account_ids.append(status["account_id"])
 
-        return filtered_statuses
+        filtered_list = []
+        date_statuses = defaultdict(list)
+        for status in statuses:
+            date = status['created_at'].date()
+            date_statuses[date].append(status)
+        for date, statuses in date_statuses.items():
+            statuses.sort(key=lambda x: x['ranking_score'], reverse=True)
+            authors = defaultdict(int)
+            for status in statuses:
+                if authors[status['account_id']] < number_of_allowed_status_from_same_account:
+                    filtered_list.append(status)
+                    authors[status['account_id']] += 1
+        return filtered_list
 
     def sort_statuses_by_ranking_score(self, statuses):
         """Function to sort statuses by ranking score.
@@ -223,7 +227,7 @@ class RankingSystem:
         return: A list of sorted status ids by ranking score.
         """
 
-        # Get statuses with tag ids and stats
+        # Get stat,uses with tag ids and stats
         statuses_with_tag_ids_and_stats = [
             get_status_with_tag_ids_and_stats_by_status_id(status_id) for status_id in status_ids
         ]
@@ -240,16 +244,16 @@ class RankingSystem:
             for status in statuses_with_tag_ids_and_stats
         ]
 
-        filtered_statuses = self.filter_statuses_by_threshold(ranked_statuses, self.ranking_score_threshold)
+        # Filter out statuses from the same account
+        ranked_statuses_with_author_diversity = self.promote_author_diversity(
+            ranked_statuses, self.number_of_allowed_status_from_same_account
+        )
+
+        filtered_statuses = self.filter_statuses_by_threshold(ranked_statuses_with_author_diversity, self.ranking_score_threshold)
 
         # Sort statuses by ranking score
         sorted_statuses = self.sort_statuses_by_ranking_score(filtered_statuses)
 
-        # Filter out statuses from the same account
-        recommended_statuses = self.filter_statuses_by_account_diverstity(
-            sorted_statuses, self.number_of_allowed_status_from_same_account
-        )
+        sorted_statuses_ids = [status["id"] for status in sorted_statuses]
 
-        recommended_statuses_ids = [status["id"] for status in recommended_statuses]
-
-        return recommended_statuses_ids
+        return sorted_statuses_ids

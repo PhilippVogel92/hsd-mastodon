@@ -10,7 +10,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 class TagGenerator:
     """Class to extract keywords from a text and compare them with hashtags."""
 
-    def __init__(self, status, nlp_model_loader, treshold=0.6):
+    def __init__(self, status, nlp_model_loader, treshold=0.1):
         self.nlp_model_loader = nlp_model_loader
         self.nlp = self.choose_nlp_model(status)
         self.treshold = treshold

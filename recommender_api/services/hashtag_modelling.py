@@ -116,7 +116,7 @@ class TagGenerator:
         self.status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(self.status["text"])
 
         # extract keywords from text
-        matches = self.match_hashtags_with_status_tfidf(hashtags)
+        matches = self.match_hashtags_with_status(hashtags)
 
         end = time.time()
         diff = end - start

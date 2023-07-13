@@ -50,7 +50,11 @@ class TagGenerator:
         return keywords
 
     def match_hashtags_with_status(self, hashtags):
-        """Function to match hashtags with text."""
+        """
+        Function to match hashtags with text.
+        Params: hashtags: List of hashtags from database.
+        Return: List of hashtags which match with the text.
+        """
         matches = []
         status_text = self.status["preprocessed_content"]
         status_id = self.status["id"]
@@ -77,14 +81,10 @@ class TagGenerator:
         with open("log_hashtag_modelling.txt", "a") as f:
             print("Triggered hashtag modelling for status:", self.status["id"], file=f)
             
-        # timer which stops the second from start to end
         start = time.time()
-
-        # get all hashtags from database
+        
         hashtags = get_all_tags_with_name_and_id()
-
         status_tags = get_tags_by_status_id(self.status["id"])
-
         hashtags = [hashtag for hashtag in hashtags if hashtag[0] not in status_tags]
 
         # initialize text preprocessor

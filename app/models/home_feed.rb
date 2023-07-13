@@ -62,8 +62,17 @@ class HomeFeed < Feed
 
   def get_recommendations(status_ids)
     headers = { 'Content-Type': 'application/json' }
-    response = Net::HTTP.post(URI(ENV['RECOMMENDER_URL'] + "accounts/#{@account.id}/create-sorted-timeline"), { "status_ids": status_ids}.to_json, headers)
-    JSON.parse(response.body)
+    begin
+      response = Net::HTTP.post(URI(ENV['RECOMMENDER_URL'] + "accounts/#{@account.id}/create-sorted-timeline"), { "status_ids": status_ids}.to_json, headers)
+    rescue StandardError
+      raise Mastodon::RecommenderConnectionRefusedError, I18n.t('recommender.error.connection_refused')
+    else
+      if response.code == '200'
+        JSON.parse(response.body)
+      else
+        raise Mastodon::RecommenderResponseError, I18n.t('recommender.error.recommender_response')
+      end
+    end
   end
 
 end

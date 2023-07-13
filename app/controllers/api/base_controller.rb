@@ -81,6 +81,14 @@ class Api::BaseController < ApplicationController
     render json: { error: e.to_s }, status: 400
   end
 
+  rescue_from Mastodon::RecommenderConnectionRefusedError do |e|
+    render json: { error: e.to_s }, status: 500
+  end
+
+  rescue_from Mastodon::RecommenderResponseError do |e|
+    render json: { error: e.to_s }, status: 400
+  end
+
   def doorkeeper_unauthorized_render_options(error: nil)
     { json: { error: (error.try(:description) || 'Not authorized') } }
   end

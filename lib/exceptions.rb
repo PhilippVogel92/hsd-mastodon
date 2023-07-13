@@ -35,4 +35,8 @@ module Mastodon
       super()
     end
   end
+
+  class RecommenderConnectionRefusedError < Error; end
+  class RecommenderResponseError < Error; end
+
 end

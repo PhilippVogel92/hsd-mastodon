@@ -9,6 +9,7 @@ class Api::V1::Statuses::FavouritesController < Api::BaseController
 
   def create
     FavouriteService.new.call(current_account, @status)
+    del_key_recommender(current_account.id)
     render json: @status, serializer: REST::StatusSerializer
   end
 
@@ -23,6 +24,7 @@ class Api::V1::Statuses::FavouritesController < Api::BaseController
       authorize @status, :show?
     end
 
+    del_key_recommender(current_account.id)
     render json: @status, serializer: REST::StatusSerializer, relationships: StatusRelationshipsPresenter.new([@status], current_account.id, favourites_map: { @status.id => false })
   rescue Mastodon::NotPermittedError
     not_found

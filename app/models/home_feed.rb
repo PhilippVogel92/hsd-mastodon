@@ -26,30 +26,25 @@ class HomeFeed < Feed
 
   def from_redis_recommender(limit, max_id, since_id, status_count)
     recommender_feed_key = key_recommender
-    recommender_feed_recalculate_key = key_recommender('recalculate')
-    if !redis.exists(recommender_feed_recalculate_key).zero? || redis.exists(recommender_feed_key).zero?
+    if redis.exists(recommender_feed_key).zero?
       home_feed_ids = redis.zrevrangebyscore(key, '(+inf', '(-inf').map(&:to_i)
       recommended_toots = get_recommendations(home_feed_ids)
-      redis.del(recommender_feed_recalculate_key)
       return [] if recommended_toots.empty?
-      redis.ltrim(recommender_feed_key, 1, 0)
       redis.rpush(recommender_feed_key, recommended_toots)
       status_ids = recommended_toots.take(limit)
     else
-      if max_id.present?
+      if since_id.blank?
         start_pos = status_count
         end_pos = start_pos + limit - 1
-      elsif since_id.present?
-        recommender_feed_len = redis.llen(recommender_feed_key)
+      else
         start_pos = 0
+        recommender_feed_len = redis.llen(recommender_feed_key)
         return [] if (recommender_feed_len - status_count).zero?
         end_pos = recommender_feed_len - status_count - 1
         end_pos = limit - 1 if end_pos > limit - 1
-      else
-        start_pos = 0
-        end_pos = limit - 1
       end
       status_ids = redis.lrange(recommender_feed_key, start_pos, end_pos).map(&:to_i)
+      status_ids = status_ids.take(status_ids.index(since_id) || limit) if since_id.present?
     end
     Status.where(id: status_ids).sort_by { |status| status_ids.index(status.id) }
   end

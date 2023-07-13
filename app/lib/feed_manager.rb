@@ -475,9 +475,8 @@ class FeedManager
       redis.zadd(timeline_key, status.id, status.id)
     end
 
-    # Set key to indicate that the recommendation timeline needs to be recalculated for the user because the home feed has changed
-    recommender_feed_recalculate_key = key(timeline_type, account_id, 'recommender:recalculate')
-    redis.set(recommender_feed_recalculate_key, true) if timeline_type == :home && redis.exists(recommender_feed_recalculate_key).zero?
+    # Del key for recommendation feed to indicate that it needs to be recalculated for the user because the home feed has changed
+    redis.del(key(timeline_type, account_id, 'recommender')) if timeline_type == :home
     true
   end
 
@@ -522,6 +521,9 @@ class FeedManager
     end
 
     redis.zrem(timeline_key, status.id)
+
+    # Del key for recommendation feed to indicate that it needs to be recalculated for the user because the home feed has changed
+    redis.del(key(timeline_type, account_id, 'recommender')) if timeline_type == :home
   end
 
   # Pre-fetch various objects and relationships for given statuses that

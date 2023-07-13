@@ -70,7 +70,7 @@ class TagGenerator:
         Params: hashtags: List of hashtags from database.
         """
         persisted_relations = []
-        status_text = self.status["preprocessed_content"]
+        status_text = self.status["text"]
         status_id = self.status["id"]
         keywords = self.extract_keywords(status_text)
         matches = []

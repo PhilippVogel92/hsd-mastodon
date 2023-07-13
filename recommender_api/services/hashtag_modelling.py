@@ -3,6 +3,8 @@ from ..model.status_queries import persist_status_tag_relation
 from ..model.tag_queries import get_all_tags_with_name_and_id, get_tags_by_status_id
 from langdetect import detect
 import time
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 class TagGenerator:
@@ -62,6 +64,36 @@ class TagGenerator:
 
         return matches
 
+    def match_hashtags_with_status_tfidf(self, hashtags):
+        """
+        Function to match hashtags with text and persist the relations.
+        Params: hashtags: List of hashtags from database.
+        """
+        persisted_relations = []
+        status_text = self.status["preprocessed_content"]
+        status_id = self.status["id"]
+        keywords = self.extract_keywords(status_text)
+        matches = []
+
+        # Compute cosine similarity between keywords and hashtags
+        vectorizer = TfidfVectorizer()
+        hashtag_names = [hashtag[0] for hashtag in hashtags]
+        hashtag_tfidf = vectorizer.fit_transform(hashtag_names)
+        keyword_tfidf = vectorizer.transform(keywords)
+        similarities = cosine_similarity(keyword_tfidf, hashtag_tfidf)
+
+        # Select hashtags with similarity above threshold
+        for i, keyword in enumerate(keywords):
+            for j, hashtag in enumerate(hashtags):
+                similarity = similarities[i, j]
+                if similarity >= self.treshold:
+                    hashtag_id = hashtag[1]
+                    if (status_id, hashtag_id) not in persisted_relations:
+                        persist_status_tag_relation(status_id, hashtag_id)
+                        persisted_relations.append((status_id, hashtag_id))
+                        matches.append((hashtag[0], keyword, similarity))
+        return matches
+
     def generate_hashtags(self):
         """Function to generate hashtags for a status."""
 
@@ -84,7 +116,7 @@ class TagGenerator:
         self.status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(self.status["text"])
 
         # extract keywords from text
-        matches = self.match_hashtags_with_status(hashtags)
+        matches = self.match_hashtags_with_status_tfidf(hashtags)
 
         end = time.time()
         diff = end - start
@@ -100,7 +132,6 @@ class TagGenerator:
                 self.status["preprocessed_content"],
                 "/ Matches:",
                 matches,
-                "-----------------",
                 file=f,
             )
         return matches

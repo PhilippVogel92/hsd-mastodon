@@ -14,6 +14,7 @@ nlp_model_loader.load_model("de_core_news_lg")
 
 ranking_system = RankingSystem()
 
+
 @recommender_route.route("/accounts/<account_id>/create-sorted-timeline", methods=["POST"])
 def sort_timeline(account_id):
     user_input = request.get_json()
@@ -23,9 +24,9 @@ def sort_timeline(account_id):
         abort(400)
 
     recommendations = ranking_system.sort_timeline(account_id, dto.status_ids)
-
     return jsonify(recommendations)
- 
+
+
 @recommender_route.route("/statuses/<status_id>/generate-tags", methods=["GET"])
 def generate_tag_for_status(status_id):
     try:
@@ -33,5 +34,5 @@ def generate_tag_for_status(status_id):
     except IndexError:
         abort(404)
     tag_generator = TagGenerator(status, nlp_model_loader)
-    status_with_tag = tag_generator.generate_hashtags()
-    return jsonify(status_with_tag)
+    matches = tag_generator.generate_hashtags()
+    return jsonify(matches)

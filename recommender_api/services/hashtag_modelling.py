@@ -42,6 +42,23 @@ class TagGenerator:
 
         return keywords
 
+    """ def match_hashtags_with_status(self, hashtags):
+        persisted_relations = []
+        status_text = self.status["preprocessed_content"]
+        status_id = self.status["id"]
+        keywords = self.extract_keywords(status_text)
+        matches = []
+        for keyword_doc in self.nlp.pipe(keywords):
+            for hashtag_doc, hashtag_id in self.nlp.pipe(hashtags, as_tuples=True):
+                similarity = keyword_doc.similarity(hashtag_doc)
+                if similarity >= self.treshold:
+                    if (status_id, hashtag_id) not in persisted_relations:
+                        persist_status_tag_relation(status_id, hashtag_id)
+                        persisted_relations.append((status_id, hashtag_id, similarity))
+                        matches.append((hashtag_doc.text, keyword_doc.text, similarity))
+
+        return matches """
+
     def match_hashtags_with_status(self, hashtags):
         """
         Function to match hashtags with text.
@@ -57,12 +74,20 @@ class TagGenerator:
             for hashtag_doc, hashtag_id in self.nlp.pipe(hashtags, as_tuples=True):
                 similarity = keyword_doc.similarity(hashtag_doc)
                 if similarity >= self.treshold:
-                    if (status_id, hashtag_id) not in persisted_relations:
-                        persist_status_tag_relation(status_id, hashtag_id)
-                        persisted_relations.append((status_id, hashtag_id))
-                        matches.append((hashtag_doc.text, keyword_doc.text, similarity))
+                    matches.append((hashtag_doc.text, keyword_doc.text, similarity, hashtag_id))
 
-        return matches
+        # Sort matches by similarity in descending order and keep only the top 3
+        matches.sort(key=lambda x: x[2], reverse=True)
+        top_3_matches = matches[:3]
+
+        # Persist the top 3 matches
+        for match in top_3_matches:
+            hashtag_id = match[3]
+            if (status_id, hashtag_id) not in persisted_relations:
+                persist_status_tag_relation(status_id, hashtag_id)
+                persisted_relations.append((status_id, hashtag_id))
+
+        return top_3_matches
 
     def match_hashtags_with_status_tfidf(self, hashtags):
         """

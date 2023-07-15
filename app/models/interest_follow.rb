@@ -10,6 +10,7 @@
 #
 class InterestFollow < ApplicationRecord
   include RateLimitable
+  include Paginable
 
   belongs_to :interest
   belongs_to :account

@@ -87,7 +87,7 @@ class InterestsFilter extends React.PureComponent {
     let tagAlreadyFollowed = this.state.followedTags.filter(hashtag => hashtag.get('name') === this.props.value).size > 0;
     if (tagAlreadyFollowed === true) return;
     this.props.followInterest(this.props.value);
-    if (this.props.results.get('hashtags')?.size === 0) {
+    if (this.props.results.get('interests')?.size === 0) {
       this.props.onChange('');
     }
     let newTag = new Map();
@@ -134,7 +134,7 @@ class InterestsFilter extends React.PureComponent {
     const { intl, value, submitted, results } = this.props;
     const { followedTags } = this.state;
     const hasValue = value.length > 0 || submitted;
-    const notFollowedTags = results.get('hashtags')?.filter(hashtag => followedTags.filter(followed => followed.get('name') === hashtag.get('name')).size === 0);
+    const notFollowedTags = results.get('interests')?.filter(hashtag => followedTags.filter(followed => followed.get('name') === hashtag.get('name')).size === 0);
 
     return (
       <div className='interests-filter'>
@@ -165,8 +165,8 @@ class InterestsFilter extends React.PureComponent {
           />
         </div>
 
-        {results.get('hashtags') !== undefined &&
-          results.get('hashtags').size === 0 &&
+        {results.get('interests') !== undefined &&
+          results.get('interests').size === 0 &&
           value !== '' ? (
             <div className='new-hashtag'>
               <p><FormattedMessage id='interests_selection.search.empty' values={{ hashtag: value }} defaultMessage='The hashtag {hashtag} does not yet exist' /> </p>

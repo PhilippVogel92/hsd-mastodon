@@ -48,7 +48,7 @@ export const fetchHashtagFail = error => ({
 export const fetchFollowedHashtags = () => (dispatch, getState) => {
   dispatch(fetchFollowedHashtagsRequest());
 
-  api(getState).get('/api/v1/followed_tags').then(response => {
+  api(getState).get('/api/hsd/followed_interests').then(response => {
     const next = getLinks(response).refs.find(link => link.rel === 'next');
     dispatch(fetchFollowedHashtagsSuccess(response.data, next ? next.uri : null));
   }).catch(err => {

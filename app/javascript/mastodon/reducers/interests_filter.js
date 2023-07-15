@@ -36,7 +36,7 @@ export default function interests_filter(state = initialState, action) {
   case INTERESTS_FILTER_FETCH_SUCCESS:
     return state.withMutations(map => {
       map.set('results', ImmutableMap({
-        hashtags: fromJS(action.results.hashtags),
+        interests: fromJS(action.results.hashtags),
       }));
 
       map.set('searchTerm', action.searchTerm);

@@ -698,6 +698,7 @@ Rails.application.routes.draw do
     end
 
     namespace :hsd do
+      resources :followed_interests, only: [:index]
       resources :interests, only: [:show] do
         member do
           post :follow

@@ -3,9 +3,11 @@ import {
   changeInterestsFilter,
   clearInterestsFilter,
   fetchInterestsFilter,
-} from '../../../actions/interests_filter';
+  followInterest,
+  unfollowInterest,
+} from 'mastodon/actions/interests_filter';
 import InterestsFilter from '../components/interests_filter';
-import { unfollowHashtag, followHashtag, fetchFollowedHashtags } from 'mastodon/actions/tags';
+import { unfollowHashtag, fetchFollowedHashtags } from 'mastodon/actions/tags';
 
 const mapStateToProps = state => ({
   value: state.getIn(['interests_filter', 'value']),
@@ -29,11 +31,11 @@ const mapDispatchToProps = dispatch => ({
   },
 
   followInterest(name) {
-    dispatch(followHashtag(name));
+    dispatch(followInterest(name));
   },
 
   unfollowInterest(name) {
-    dispatch(unfollowHashtag(name));
+    dispatch(unfollowInterest(name));
   },
 
   onClear () {

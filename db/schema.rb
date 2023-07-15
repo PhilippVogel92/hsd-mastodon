@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_12_06_114142) do
+ActiveRecord::Schema.define(version: 2023_07_15_172331) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -191,6 +191,13 @@ ActiveRecord::Schema.define(version: 2022_12_06_114142) do
     t.index ["moved_to_account_id"], name: "index_accounts_on_moved_to_account_id", where: "(moved_to_account_id IS NOT NULL)"
     t.index ["uri"], name: "index_accounts_on_uri"
     t.index ["url"], name: "index_accounts_on_url", opclass: :text_pattern_ops, where: "(url IS NOT NULL)"
+  end
+
+  create_table "accounts_interests", id: false, force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "interest_id", null: false
+    t.index ["account_id", "interest_id"], name: "index_accounts_interests_on_account_id_and_interest_id"
+    t.index ["interest_id", "account_id"], name: "index_accounts_interests_on_interest_id_and_account_id", unique: true
   end
 
   create_table "accounts_tags", id: false, force: :cascade do |t|
@@ -499,6 +506,30 @@ ActiveRecord::Schema.define(version: 2022_12_06_114142) do
     t.datetime "data_updated_at"
     t.bigint "account_id", null: false
     t.boolean "overwrite", default: false, null: false
+  end
+
+  create_table "interest_follows", force: :cascade do |t|
+    t.bigint "interest_id", null: false
+    t.bigint "account_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id", "interest_id"], name: "index_interest_follows_on_account_id_and_interest_id", unique: true
+    t.index ["interest_id"], name: "index_interest_follows_on_interest_id"
+  end
+
+  create_table "interests", force: :cascade do |t|
+    t.string "name"
+    t.string "display_name"
+    t.datetime "last_status_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "interests_statuses", id: false, force: :cascade do |t|
+    t.bigint "status_id", null: false
+    t.bigint "interest_id", null: false
+    t.index ["interest_id", "status_id"], name: "index_interests_statuses_on_interest_id_and_status_id", unique: true
+    t.index ["interest_id"], name: "index_interests_statuses_on_interest_id"
   end
 
   create_table "invites", force: :cascade do |t|
@@ -1168,6 +1199,8 @@ ActiveRecord::Schema.define(version: 2022_12_06_114142) do
   add_foreign_key "follows", "accounts", name: "fk_32ed1b5560", on_delete: :cascade
   add_foreign_key "identities", "users", name: "fk_bea040f377", on_delete: :cascade
   add_foreign_key "imports", "accounts", name: "fk_6db1b6e408", on_delete: :cascade
+  add_foreign_key "interest_follows", "accounts", on_delete: :cascade
+  add_foreign_key "interest_follows", "interests", on_delete: :cascade
   add_foreign_key "invites", "users", on_delete: :cascade
   add_foreign_key "list_accounts", "accounts", on_delete: :cascade
   add_foreign_key "list_accounts", "follows", on_delete: :cascade

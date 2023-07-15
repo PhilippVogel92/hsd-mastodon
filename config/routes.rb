@@ -697,6 +697,15 @@ Rails.application.routes.draw do
       end
     end
 
+    namespace :hsd do
+      resources :interests, only: [:show] do
+        member do
+          post :follow
+          post :unfollow
+        end
+      end
+    end
+
     namespace :web do
       resource :settings, only: [:update]
       resource :embed, only: [:create]

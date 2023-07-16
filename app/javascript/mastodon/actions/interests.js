@@ -78,9 +78,8 @@ export function fetchFollowedInterestsFail(error) {
 export function fetchInterestsFilter() {
   return (dispatch, getState) => {
     const value    = getState().getIn(['interests_filter', 'value']);
-    const signedIn = !!getState().getIn(['meta', 'me']);
     if (value.length === 0) {
-      dispatch(fetchInterestsSuccess({ accounts: [], statuses: [], interests: [] }, ''));
+      dispatch(fetchInterestsSuccess([], ''));
       return;
     }
 

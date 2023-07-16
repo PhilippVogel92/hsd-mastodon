@@ -6,6 +6,8 @@ class CreateInterests < ActiveRecord::Migration[6.1]
       t.datetime :last_status_at
 
       t.timestamps
+
     end
+    add_index :interests, :name, unique: true
   end
 end

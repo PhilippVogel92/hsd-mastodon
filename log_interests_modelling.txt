@@ -14,3 +14,5 @@ Triggered interest modelling for status: 110723523483827458
 Zeitaufwand: 0.030710458755493164 / Status: @benling dnoajond / Preprocessed Text: Dnoajond / Matches: []
 Triggered interest modelling for status: 110723528649770759
 Zeitaufwand: 0.03338289260864258 / Status: der baum ist toll so in der landschaft. / Preprocessed Text: Baum toll Landschaft / Matches: [('landschaft', 'landschaft', 1.0, 5), ('natur', 'landschaft', 0.6113209760873612, 4)]
+Triggered interest modelling for status: 110724030114184564
+Zeitaufwand: 0.5044119358062744 / Status: Basketball ist ein toller Sport! / Preprocessed Text: Basketball toll Sport / Matches: [('basketball', 'basketball', 1.0, 1), ('handball', 'basketball', 0.8017132600305017, 96), ('tennis', 'basketball', 0.7897173356681195, 42)]

@@ -36,6 +36,6 @@ class Api::Hsd::InterestsController < Api::BaseController
   private
 
   def set_search_results
-    @search_results = Interest.where("name LIKE :search", search: params[:q])
+    @search_results = Interest.where("name LIKE :search", search: "#{params[:q]}%")
   end
 end

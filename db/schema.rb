@@ -193,13 +193,6 @@ ActiveRecord::Schema.define(version: 2023_07_15_172331) do
     t.index ["url"], name: "index_accounts_on_url", opclass: :text_pattern_ops, where: "(url IS NOT NULL)"
   end
 
-  create_table "accounts_interests", id: false, force: :cascade do |t|
-    t.bigint "account_id", null: false
-    t.bigint "interest_id", null: false
-    t.index ["account_id", "interest_id"], name: "index_accounts_interests_on_account_id_and_interest_id"
-    t.index ["interest_id", "account_id"], name: "index_accounts_interests_on_interest_id_and_account_id", unique: true
-  end
-
   create_table "accounts_tags", id: false, force: :cascade do |t|
     t.bigint "account_id", null: false
     t.bigint "tag_id", null: false
@@ -523,6 +516,7 @@ ActiveRecord::Schema.define(version: 2023_07_15_172331) do
     t.datetime "last_status_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_interests_on_name", unique: true
   end
 
   create_table "interests_statuses", id: false, force: :cascade do |t|

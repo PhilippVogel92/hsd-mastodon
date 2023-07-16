@@ -23,7 +23,7 @@ const mapDispatchToProps = dispatch => ({
   },
 
   onChange (value) {
-    dispatch(changeInterestsFilter(value));
+      dispatch(changeInterestsFilter(value));
   },
 
   searchInterests() {

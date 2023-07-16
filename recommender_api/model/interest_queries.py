@@ -70,3 +70,27 @@ def persist_interest(name):
   conn.commit()
   cur.close()
   return True
+
+
+def set_last_status_at(interest_id):
+  """
+  Persist last_status_at for a specific interest.
+
+  param interest_id: The id of the interest.
+  return: Boolean.
+  """
+  ts = time.time()
+  timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+  cur = conn.cursor()
+  cur.execute(
+    """
+    UPDATE interests 
+    SET last_status_at = %s 
+    WHERE id = %s;
+    """,
+    (timestamp, interest_id,),
+  )
+  conn.commit()
+  cur.close()
+  return True
+

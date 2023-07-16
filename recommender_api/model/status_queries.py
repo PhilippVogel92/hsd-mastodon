@@ -25,7 +25,6 @@ def persist_status_interest_relation(status_id, interest_id):
     cur.close()
     return True
 
-
 def get_status_by_id(status_id):
     """
     Get a status by id.

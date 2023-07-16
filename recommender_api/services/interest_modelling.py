@@ -1,6 +1,6 @@
 from .preprocessing import TextPreprocessor
 from ..model.status_queries import persist_status_interest_relation
-from ..model.interest_queries import get_all_interests_with_name_and_id, get_interests_by_status_id
+from ..model.interest_queries import get_all_interests_with_name_and_id, get_interests_by_status_id, set_last_status_at
 from langdetect import detect
 import time
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -85,6 +85,7 @@ class InterestGenerator:
             interest_id = match[3]
             if (status_id, interest_id) not in persisted_relations:
                 persist_status_interest_relation(status_id, interest_id)
+                set_last_status_at(interest_id)
                 persisted_relations.append((status_id, interest_id))
 
         return top_3_matches

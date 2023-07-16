@@ -184,7 +184,7 @@ class InterestsFilter extends React.PureComponent {
             </div>
           )}
 
-        <div className='column-list followed-hashtags'>
+        <div className='followed-hashtags'>
           <h4><FormattedMessage id='interests_selection.followed_interests.title' defaultMessage='Your followed interests' /></h4>
           {followedInterests.size === 0 ? (
             <p><FormattedMessage id='interests_selection.followed_interests.empty' defaultMessage='You dont follow any interests' /></p>

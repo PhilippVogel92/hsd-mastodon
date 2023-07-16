@@ -4,7 +4,7 @@ from collections import defaultdict
 from recommender_api.model.status_queries import (
     get_status_with_tag_ids_and_stats_by_status_id,
 )
-from recommender_api.model.tag_queries import get_tags_by_account_id
+from recommender_api.model.interest_queries import get_tags_by_account_id
 from recommender_api.model.account_queries import get_followed_accounts, get_blocked_accounts, get_muted_accounts
 
 

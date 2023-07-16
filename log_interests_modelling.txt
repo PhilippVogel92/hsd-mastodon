@@ -1,0 +1,8 @@
+Triggered interest modelling for status: 110723257452191851
+Triggered interest modelling for status: 110723260459127798
+Triggered interest modelling for status: 110723275212027416
+Zeitaufwand: 0.048300743103027344 / Status: test baum / Preprocessed Text: Test Baum / Matches: [('test', 'test', 1.0, 1)]
+Triggered interest modelling for status: 110723278657718957
+Zeitaufwand: 0.04106593132019043 / Status: Der Baum ist groß. / Preprocessed Text: Baum / Matches: []
+Triggered interest modelling for status: 110723280294035850
+Zeitaufwand: 0.03053116798400879 / Status: Die Natur ist toll. / Preprocessed Text: Natur toll / Matches: [('natur', 'natur', 1.0, 4), ('landschaft', 'natur', 0.6113209760873612, 5)]

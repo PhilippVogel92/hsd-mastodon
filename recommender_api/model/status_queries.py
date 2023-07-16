@@ -1,24 +1,24 @@
 from .db_connection import conn
 
 
-def persist_status_tag_relation(status_id, tag_id):
+def persist_status_interest_relation(status_id, interest_id):
     """
-    Persist a relation between status and tag.
+    Persist a relation between status and interest.
 
     param status_id: The id of the status.
-    param tag_id: The id of the tag.
+    param interest_id: The id of the interest.
     return: Boolean.
     """
     cur = conn.cursor()
     cur.execute(
         """
-        INSERT INTO statuses_tags (status_id, tag_id) 
+        INSERT INTO interests_statuses (status_id, interest_id)
         VALUES (%s, %s)
-        ON CONFLICT (status_id, tag_id) DO NOTHING;
+        ON CONFLICT (status_id, interest_id) DO NOTHING;
         """,
         (
             status_id,
-            tag_id,
+            interest_id,
         ),
     )
     conn.commit()

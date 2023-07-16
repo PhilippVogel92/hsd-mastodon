@@ -4739,6 +4739,14 @@ a.status-card.compact:hover {
   position: relative;
 }
 
+.interests-title {
+  padding-top: 0;
+}
+
+.interests-container {
+  padding: 20px 20px 10px 20px;
+}
+
 .interests-filter {
   @extend .search;
   display: flex;
@@ -4746,11 +4754,6 @@ a.status-card.compact:hover {
   flex-wrap: wrap;
   align-items: center;
   row-gap: 5px;
-
-  .search__input {
-    border: 1px solid lighten($ui-base-color, 8%);
-    background: darken($ui-base-color, 2%);
-  }
 
   .search-results__section {
     display: flex;
@@ -4760,10 +4763,11 @@ a.status-card.compact:hover {
   }
 
   .new-interest {
-    margin: 0 0 10px 0;
-    &,
+    margin: 10px 0;
+    text-align: center;
+
     p {
-      margin-bottom: 5px;
+      margin-bottom: 10px;
     }
 
     .button {
@@ -4772,13 +4776,19 @@ a.status-card.compact:hover {
   }
 
   .followed-hashtags {
+    margin-top: 10px;
     width: 100%;
-    padding: 20px 0;
     h4 {
+      text-align: center;
       margin-bottom: 10px;
       font-weight: bold;
       font-size: 1.3em;
     }
+  }
+
+  p {
+    text-align: center;
+    margin-bottom: 10px;
   }
 
   .interest {

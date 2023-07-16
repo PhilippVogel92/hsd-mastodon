@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, abort
 from ..model.status_queries import get_status_by_id
 
 from recommender_api.services.ranking_system import RankingSystem
-from recommender_api.services.hashtag_modelling import TagGenerator
+from recommender_api.services.interest_modelling import InterestGenerator
 from recommender_api.services.nlp_model_loader import NLPModelLoader
 from recommender_api.dto.user_input_dto import UserInputDTO
 
@@ -27,12 +27,13 @@ def sort_timeline(account_id):
     return jsonify(recommendations)
 
 
-@recommender_route.route("/statuses/<status_id>/generate-tags", methods=["GET"])
-def generate_tag_for_status(status_id):
+
+@recommender_route.route("/statuses/<status_id>/generate-interests", methods=["GET"])
+def generate_interests_for_status(status_id):
     try:
         status = get_status_by_id(status_id)
     except IndexError:
         abort(404)
-    tag_generator = TagGenerator(status, nlp_model_loader)
-    matches = tag_generator.generate_hashtags()
+    interest_generator = InterestGenerator(status, nlp_model_loader)
+    matches = interest_generator.generate_interests()
     return jsonify(matches)

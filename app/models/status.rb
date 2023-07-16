@@ -71,6 +71,7 @@ class Status < ApplicationRecord
   has_many :media_attachments, dependent: :nullify
 
   has_and_belongs_to_many :tags
+  has_and_belongs_to_many :interests
   has_and_belongs_to_many :preview_cards
 
   has_one :notification, as: :activity, dependent: :destroy

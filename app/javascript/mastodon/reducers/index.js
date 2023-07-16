@@ -42,6 +42,7 @@ import accounts_map from './accounts_map';
 import history from './history';
 import tags from './tags';
 import followed_tags from './followed_tags';
+import followed_interests from './followed_interests';
 
 const reducers = {
   announcements,
@@ -87,6 +88,7 @@ const reducers = {
   history,
   tags,
   followed_tags,
+  followed_interests,
 };
 
 export default combineReducers(reducers);

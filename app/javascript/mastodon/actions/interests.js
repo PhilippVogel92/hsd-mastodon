@@ -1,15 +1,28 @@
-import api from '../api';
+import api, {getLinks} from '../api';
+import {
+  fetchFollowedHashtagsFail,
+  fetchFollowedHashtagsRequest,
+  fetchFollowedHashtagsSuccess, FOLLOWED_HASHTAGS_FETCH_FAIL, FOLLOWED_HASHTAGS_FETCH_REQUEST,
+  FOLLOWED_HASHTAGS_FETCH_SUCCESS
+} from "./tags";
 export const INTERESTS_FILTER_CHANGE = 'INTEREST_FILTER_CHANGE';
 export const INTERESTS_FILTER_CLEAR  = 'INTEREST_FILTER_CLEAR';
-export const INTERESTS_FILTER_FETCH_REQUEST   = 'INTERESTS_FILTER_FETCH_REQUEST';
-export const INTERESTS_FILTER_FETCH_SUCCESS   = 'INTERESTS_FILTER_FETCH_SUCCESS';
-export const INTERESTS_FILTER_FETCH_FAIL   = 'INTERESTS_FILTER_FETCH_FAIL';
+export const INTERESTS_FETCH_REQUEST   = 'INTERESTS_FETCH_REQUEST';
+export const INTERESTS_FETCH_SUCCESS   = 'INTERESTS_FETCH_SUCCESS';
+export const INTERESTS_FETCH_FAIL   = 'INTERESTS_FETCH_FAIL';
 export const INTEREST_FOLLOW_REQUEST   = 'INTEREST_FOLLOW_REQUEST';
 export const INTEREST_FOLLOW_SUCCESS   = 'INTEREST_FOLLOW_SUCCESS';
 export const INTEREST_FOLLOW_FAIL   = 'INTEREST_FOLLOW_FAIL';
 export const INTEREST_UNFOLLOW_REQUEST   = 'INTEREST_UNFOLLOW_REQUEST';
 export const INTEREST_UNFOLLOW_SUCCESS   = 'INTEREST_UNFOLLOW_SUCCESS';
 export const INTEREST_UNFOLLOW_FAIL   = 'INTEREST_UNFOLLOW_FAIL';
+export const FOLLOWED_INTERESTS_FETCH_REQUEST = 'FOLLOWED_INTERESTS_FETCH_REQUEST';
+export const FOLLOWED_INTERESTS_FETCH_SUCCESS = 'FOLLOWED_INTERESTS_FETCH_SUCCESS';
+export const FOLLOWED_INTERESTS_FETCH_FAIL    = 'FOLLOWED_INTERESTS_FETCH_FAIL';
+export const FOLLOWED_INTERESTS_EXPAND_REQUEST = 'FOLLOWED_INTERESTS_EXPAND_REQUEST';
+export const FOLLOWED_INTERESTS_EXPAND_SUCCESS = 'FOLLOWED_INTERESTS_EXPAND_SUCCESS';
+export const FOLLOWED_INTERESTS_EXPAND_FAIL    = 'FOLLOWED_INTERESTS_EXPAND_FAIL';
+
 
 export function changeInterestsFilter(value) {
   return {
@@ -24,9 +37,41 @@ export function clearInterestsFilter() {
   };
 }
 
-export function fetchInterestsFilterRequest() {
+export function fetchInterestsRequest() {
   return {
-    type: INTERESTS_FILTER_FETCH_REQUEST,
+    type: INTERESTS_FETCH_REQUEST,
+  };
+}
+
+export const fetchFollowedInterests = () => (dispatch, getState) => {
+  dispatch(fetchFollowedInterestsRequest());
+
+  api(getState).get('/api/hsd/followed_interests').then(response => {
+    const next = getLinks(response).refs.find(link => link.rel === 'next');
+    dispatch(fetchFollowedInterestsSuccess(response.data, next ? next.uri : null));
+  }).catch(err => {
+    dispatch(fetchFollowedInterestsSuccess(err));
+  });
+};
+
+export function fetchFollowedInterestsRequest() {
+  return {
+    type: FOLLOWED_INTERESTS_FETCH_REQUEST,
+  };
+}
+
+export function fetchFollowedInterestsSuccess(followed_interests, next) {
+  return {
+    type: FOLLOWED_INTERESTS_FETCH_SUCCESS,
+    followed_interests,
+    next,
+  };
+}
+
+export function fetchFollowedInterestsFail(error) {
+  return {
+    type: FOLLOWED_INTERESTS_FETCH_FAIL,
+    error,
   };
 }
 
@@ -35,37 +80,35 @@ export function fetchInterestsFilter() {
     const value    = getState().getIn(['interests_filter', 'value']);
     const signedIn = !!getState().getIn(['meta', 'me']);
     if (value.length === 0) {
-      dispatch(fetchInterestsFilterSuccess({ accounts: [], statuses: [], interests: [] }, ''));
+      dispatch(fetchInterestsSuccess({ accounts: [], statuses: [], interests: [] }, ''));
       return;
     }
 
-    dispatch(fetchInterestsFilterRequest());
+    dispatch(fetchInterestsRequest());
 
-    api(getState).get('/api/v2/search', {
+    api(getState).get('/api/hsd/interests/search', {
       params: {
         q: value,
-        resolve: signedIn,
-        limit: 5,
       },
     }).then(response => {
-      dispatch(fetchInterestsFilterSuccess(response.data, value));
+      dispatch(fetchInterestsSuccess(response.data, value));
     }).catch(error => {
-      dispatch(fetchInterestsFilterFail(error));
+      dispatch(fetchInterestsFail(error));
     });
   };
 }
 
-export function fetchInterestsFilterSuccess(results, searchTerm) {
+export function fetchInterestsSuccess(results, searchTerm) {
   return {
-    type: INTERESTS_FILTER_FETCH_SUCCESS,
+    type: INTERESTS_FETCH_SUCCESS,
     results,
     searchTerm,
   };
 }
 
-export function fetchInterestsFilterFail(error) {
+export function fetchInterestsFail(error) {
   return {
-    type: INTERESTS_FILTER_FETCH_FAIL,
+    type: INTERESTS_FETCH_FAIL,
     error,
   };
 }

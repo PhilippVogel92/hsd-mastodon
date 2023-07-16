@@ -6,7 +6,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 export default
 @injectIntl
-class InterestsFilterHashtag extends React.PureComponent {
+class Interest extends React.PureComponent {
 
   static contextTypes = {
     router: PropTypes.object.isRequired,
@@ -14,26 +14,26 @@ class InterestsFilterHashtag extends React.PureComponent {
   };
 
   static propTypes = {
-    hashtag: ImmutablePropTypes.map.isRequired,
-    isFollowingHashtagsList: PropTypes.bool.isRequired,
+    interest: ImmutablePropTypes.map.isRequired,
+    isFollowingInterestsList: PropTypes.bool.isRequired,
     onClick: PropTypes.func.isRequired,
   };
 
   handleOnClick = () => {
-    this.props.onClick(this.props.hashtag);
+    this.props.onClick(this.props.interest);
   };
 
   render() {
-    const { hashtag, isFollowingHashtagsList } = this.props;
+    const { interest, isFollowingInterestsList } = this.props;
 
     return (
       <div
-        className='interests-hashtag'
+        className='interest'
         onClick={this.handleOnClick}
-        key={hashtag.get('name')}
+        key={interest.get('name')}
       >
-        {hashtag.get('name')}
-        {isFollowingHashtagsList ? <Icon id='times-circle' /> : null}
+        {interest.get('name')}
+        {isFollowingInterestsList ? <Icon id='times-circle' /> : null}
       </div>
     );
   }

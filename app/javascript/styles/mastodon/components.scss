@@ -4755,9 +4755,12 @@ a.status-card.compact:hover {
   .search-results__section {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
+    margin: 0;
   }
 
-  .new-hashtag {
+  .new-interest {
+    margin: 0 0 10px 0;
     &,
     p {
       margin-bottom: 5px;
@@ -4768,7 +4771,17 @@ a.status-card.compact:hover {
     }
   }
 
-  .interests-hashtag {
+  .followed-hashtags {
+    width: 100%;
+    padding: 20px 0;
+    h4 {
+      margin-bottom: 10px;
+      font-weight: bold;
+      font-size: 1.3em;
+    }
+  }
+
+  .interest {
     display: flex;
     align-items: center;
     cursor: pointer;

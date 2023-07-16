@@ -1,12 +1,17 @@
 # frozen_string_literal: true
 
 class Api::Hsd::InterestsController < Api::BaseController
-  before_action -> { doorkeeper_authorize! :follow, :write, :'write:follows' }, except: :show
+  before_action -> { doorkeeper_authorize! :follow, :write, :'write:follows' }, except: [:show, :search]
   before_action :require_user!, except: :show
-  before_action :set_or_create_interest
+  before_action :set_or_create_interest, except: :search
+  before_action :set_search_results, only: :search
 
   def show
-    render json: @interest, serializer: REST::TagSerializer
+    render json: @interest, serializer: REST::InterestSerializer
+  end
+
+  def search
+    render json: @search_results, each_serializer: REST::InterestSerializer
   end
 
   def follow
@@ -26,5 +31,11 @@ class Api::Hsd::InterestsController < Api::BaseController
   def set_or_create_interest
     return not_found unless Interest::INTEREST_NAME_RE.match?(params[:id])
     @interest = Interest.find_normalized(params[:id]) || Interest.new(name: Interest.normalize(params[:id]), display_name: params[:id])
+  end
+
+  private
+
+  def set_search_results
+    @search_results = Interest.where("name LIKE :search", search: params[:q])
   end
 end

@@ -111,6 +111,9 @@ class Status < ApplicationRecord
     where('NOT EXISTS (SELECT * FROM statuses_tags forbidden WHERE forbidden.status_id = statuses.id AND forbidden.tag_id IN (?))', tag_ids)
   }
 
+  scope :by_interests, ->(interest_ids) { joins(:interests_statuses).where('interests_statuses.interest_id IN (?)', interest_ids) }
+
+
   cache_associated :application,
                    :media_attachments,
                    :conversation,

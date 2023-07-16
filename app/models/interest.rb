@@ -15,7 +15,7 @@
 class Interest < ApplicationRecord
   has_and_belongs_to_many :statuses
   has_and_belongs_to_many :accounts
-  
+
   INTEREST_SEPARATORS = "_\u00B7\u30FB\u200c"
   INTEREST_FIRST_SEQUENCE_CHUNK_ONE = "[[:word:]_][[:word:]#{INTEREST_SEPARATORS}]*[[:alpha:]#{INTEREST_SEPARATORS}]"
   INTEREST_FIRST_SEQUENCE_CHUNK_TWO = "[[:word:]#{INTEREST_SEPARATORS}]*[[:word:]_]"

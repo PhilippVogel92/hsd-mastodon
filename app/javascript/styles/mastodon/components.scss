@@ -1080,8 +1080,12 @@ body > [data-popper-placement] {
   cursor: auto;
 
   @keyframes fade {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
   }
 
   opacity: 1;
@@ -1827,11 +1831,11 @@ a.account__display-name {
   justify-content: center;
   flex-direction: column;
   scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none;  /* IE 10+ */
+  -ms-overflow-style: none; /* IE 10+ */
 
   * {
     scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* IE 10+ */
+    -ms-overflow-style: none; /* IE 10+ */
   }
 
   &::-webkit-scrollbar,
@@ -4778,6 +4782,7 @@ a.status-card.compact:hover {
   .followed-hashtags {
     margin-top: 10px;
     width: 100%;
+
     h4 {
       text-align: center;
       margin-bottom: 10px;
@@ -4790,16 +4795,45 @@ a.status-card.compact:hover {
     text-align: center;
     margin-bottom: 10px;
   }
+}
 
+.detailed-status__interests {
+  display: flex;
+  margin-top: 10px;
+}
+
+.interests-filter, .detailed-status__interests {
   .interest {
     display: flex;
     align-items: center;
-    cursor: pointer;
-    margin: 10px;
     padding: 5px 10px;
     border: 1px solid lighten($ui-base-color, 8%);
     border-radius: 4px;
+  }
+}
 
+.detailed-status__interests {
+  .interest {
+    background: lighten($ui-base-color, 8%);
+    margin-right: 10px;
+    cursor: default;
+  }
+}
+
+.detailed-status__wrapper {
+  &:focus {
+    .detailed-status__interests {
+      .interest {
+        background: $ui-base-color;
+      }
+    }
+  }
+}
+
+.interests-filter {
+  .interest {
+    cursor: pointer;
+    margin: 10px;
     &:hover,
     &.followed {
       background: lighten($ui-base-color, 8%);
@@ -6708,9 +6742,15 @@ noscript {
 }
 
 @keyframes flicker {
-  0% { opacity: 1; }
-  30% { opacity: 0.75; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @media screen and (max-width: 630px) and (max-height: 400px) {
@@ -6742,16 +6782,14 @@ noscript {
     .navigation-bar__actions {
       & > .icon-button.close {
         will-change: opacity transform;
-        transition:
-          opacity $duration * 0.5 $delay,
-          transform $duration $delay;
+        transition: opacity $duration * 0.5 $delay,
+        transform $duration $delay;
       }
 
       & > .compose__action-bar .icon-button {
         will-change: opacity transform;
-        transition:
-          opacity $duration * 0.5 $delay + $duration * 0.5,
-          transform $duration $delay;
+        transition: opacity $duration * 0.5 $delay + $duration * 0.5,
+        transform $duration $delay;
       }
     }
   }

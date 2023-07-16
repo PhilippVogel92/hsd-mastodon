@@ -16,3 +16,13 @@ Triggered interest modelling for status: 110723528649770759
 Zeitaufwand: 0.03338289260864258 / Status: der baum ist toll so in der landschaft. / Preprocessed Text: Baum toll Landschaft / Matches: [('landschaft', 'landschaft', 1.0, 5), ('natur', 'landschaft', 0.6113209760873612, 4)]
 Triggered interest modelling for status: 110724030114184564
 Zeitaufwand: 0.5044119358062744 / Status: Basketball ist ein toller Sport! / Preprocessed Text: Basketball toll Sport / Matches: [('basketball', 'basketball', 1.0, 1), ('handball', 'basketball', 0.8017132600305017, 96), ('tennis', 'basketball', 0.7897173356681195, 42)]
+Triggered interest modelling for status: 110724103363451046
+Zeitaufwand: 0.29198408126831055 / Status: Ich mag Züge. / Preprocessed Text: züge / Matches: []
+Triggered interest modelling for status: 110724106286664732
+Zeitaufwand: 0.5027716159820557 / Status: Autos sind Verkehrsmittel. / Preprocessed Text: Auto Verkehrsmittel / Matches: [('motor', 'auto', 0.6676649557413707, 427)]
+Triggered interest modelling for status: 110724112235772274
+Zeitaufwand: 0.2587699890136719 / Status: Ich mag Züge. #train / Preprocessed Text: züge Train / Matches: []
+Triggered interest modelling for status: 110724114804168582
+Zeitaufwand: 0.837590217590332 / Status: Pumas sind große Katze. Sind sind aber kleiner als Löwen. #wildtier / Preprocessed Text: Pumas Katze Löwen Wildtier / Matches: []
+Triggered interest modelling for status: 110724117081902384
+Zeitaufwand: 1.4927904605865479 / Status: In der Natur gibt es viele Tiere. Das nennt sich Flora. Ich würde gerne mal eine DataScience Projekt in dieser Richtung machen, / Preprocessed Text: Natur Tier nennen Flora gerne mal Datascience Projekt Richtung / Matches: [('natur', 'natur', 1.0, 9), ('einigung', 'richtung', 0.6195131361852527, 411), ('konstanz', 'richtung', 0.6154156875286645, 664)]

@@ -27,15 +27,15 @@ def get_interests_by_status_id(status_id):
     return [interest[0] for interest in interests]
 
 
-def get_tags_by_account_id(account_id):
+def get_interests_by_account_id(account_id):
     """
-    Get all tags of an account.
+    Get all interests of an account.
 
     param account_id: The id of the account.
-    return: A list of all tags.
+    return: A list of all interests.
     """
     cur = conn.cursor()
-    cur.execute("SELECT tag_id FROM tag_follows WHERE account_id = %s;", (account_id,))
-    tags = cur.fetchall()
+    cur.execute("SELECT interest_id FROM interest_follows WHERE account_id = %s;", (account_id,))
+    interests = cur.fetchall()
     cur.close()
-    return [tag[0] for tag in tags]
+    return [interest[0] for interest in interests]

@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class HomeFeed < Feed
+
+  # Seconds until the recommendation feed expires
+  RECOMMENDER_FEED_EXPIRE_SEC = 300
+
   def initialize(account)
     @account = account
     super(:home, account.id)
@@ -25,50 +29,19 @@ class HomeFeed < Feed
   end
 
   def from_redis_recommender(limit, max_id, since_id, status_count)
-    interests_for_account = InterestFollow.by_account(@account.id).pluck(:interest_id)
-    statuses_by_account_interests = Status.by_interests(interests_for_account).ids
-    # todo get tags by interest names
-    interest_tags_for_account = Tag.by_account_interests(interests_for_account).ids
-    statuses_by_interest_tags = Status.tagged_with(interest_tags_for_account).ids
-    recommender_pooling_statuses = statuses_by_account_interests.union(statuses_by_interest_tags)
-
     recommender_feed_key = key_recommender
     if redis.exists(recommender_feed_key).zero?
+      interests_for_account = InterestFollow.by_account(@account.id).pluck(:interest_id)
+      statuses_by_account_interests = Status.by_interests(interests_for_account).ids
+      interest_tags_for_account = Tag.by_account_interests(interests_for_account).ids
+      statuses_by_interest_tags = Status.tagged_with(interest_tags_for_account).ids
+      recommender_pooling_statuses = statuses_by_account_interests.union(statuses_by_interest_tags)
       home_feed_ids = redis.zrevrangebyscore(key, '(+inf', '(-inf').map(&:to_i)
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug(home_feed_ids.count)
-      Rails.logger.debug(recommender_pooling_statuses.count)
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      home_feed_ids = home_feed_ids.union(recommender_pooling_statuses)
-
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug(home_feed_ids.count)
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      Rails.logger.debug("")
-      recommended_toots = get_recommendations(home_feed_ids)
+      interesting_toots = home_feed_ids.union(recommender_pooling_statuses)
+      recommended_toots = get_recommendations(interesting_toots)
       return [] if recommended_toots.empty?
       redis.rpush(recommender_feed_key, recommended_toots)
+      redis.expire(recommender_feed_key, HomeFeed::RECOMMENDER_FEED_EXPIRE_SEC)
       status_ids = recommended_toots.take(limit)
     else
       if since_id.blank?

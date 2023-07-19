@@ -42,23 +42,6 @@ class InterestGenerator:
 
         return keywords
 
-    """ def match_hashtags_with_status(self, hashtags):
-        persisted_relations = []
-        status_text = self.status["preprocessed_content"]
-        status_id = self.status["id"]
-        keywords = self.extract_keywords(status_text)
-        matches = []
-        for keyword_doc in self.nlp.pipe(keywords):
-            for hashtag_doc, hashtag_id in self.nlp.pipe(hashtags, as_tuples=True):
-                similarity = keyword_doc.similarity(hashtag_doc)
-                if similarity >= self.treshold:
-                    if (status_id, hashtag_id) not in persisted_relations:
-                        persist_status_tag_relation(status_id, hashtag_id)
-                        persisted_relations.append((status_id, hashtag_id, similarity))
-                        matches.append((hashtag_doc.text, keyword_doc.text, similarity))
-
-        return matches """
-
     def match_interests_with_status(self, interests):
         """
         Function to match interests with text.
@@ -70,12 +53,23 @@ class InterestGenerator:
         status_id = self.status["id"]
         keywords = self.extract_keywords(status_text)
         matches = []
+        
+        start_time = time.time()
+        max_duration = 50 # Setze die maximale Dauer auf 50 Sekunden
+
         for keyword_doc in self.nlp.pipe(keywords):
             for interest_doc, interest_id in self.nlp.pipe(interests, as_tuples=True):
+                # Überprüfe, ob die maximale Dauer überschritten wurde
+                if time.time() - start_time > max_duration:
+                    break
                 similarity = keyword_doc.similarity(interest_doc)
                 if similarity >= self.treshold:
                     matches.append((interest_doc.text, keyword_doc.text, similarity, interest_id))
+            else:
+                continue
+            break
 
+                
         # Sort matches by similarity in descending order and keep only the top 3
         matches.sort(key=lambda x: x[2], reverse=True)
         top_3_matches = matches[:3]

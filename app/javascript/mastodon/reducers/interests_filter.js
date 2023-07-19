@@ -1,10 +1,10 @@
 import {
   INTERESTS_FILTER_CHANGE,
   INTERESTS_FILTER_CLEAR,
-  INTERESTS_FILTER_FETCH_SUCCESS,
-  INTERESTS_FILTER_FETCH_FAIL,
-  INTERESTS_FILTER_FETCH_REQUEST,
-} from '../actions/interests_filter';
+  INTERESTS_FETCH_SUCCESS,
+  INTERESTS_FETCH_FAIL,
+  INTERESTS_FETCH_REQUEST,
+} from '../actions/interests';
 import { Map as ImmutableMap, fromJS } from 'immutable';
 
 const initialState = ImmutableMap({
@@ -28,21 +28,21 @@ export default function interests_filter(state = initialState, action) {
       map.set('results', ImmutableMap());
       map.set('submitted', false);
     });
-  case INTERESTS_FILTER_FETCH_REQUEST:
+  case INTERESTS_FETCH_REQUEST:
     return state.withMutations(map => {
       map.set('isLoading', true);
       map.set('submitted', true);
     });
-  case INTERESTS_FILTER_FETCH_SUCCESS:
+  case INTERESTS_FETCH_SUCCESS:
     return state.withMutations(map => {
       map.set('results', ImmutableMap({
-        hashtags: fromJS(action.results.hashtags),
+        interests: fromJS(action.results),
       }));
 
       map.set('searchTerm', action.searchTerm);
       map.set('isLoading', false);
     });
-  case INTERESTS_FILTER_FETCH_FAIL:
+  case INTERESTS_FETCH_FAIL:
     return state.set('isLoading', false);
   default:
     return state;

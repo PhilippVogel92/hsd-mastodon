@@ -1,30 +1,29 @@
 from .db_connection import conn
 
 
-def persist_status_tag_relation(status_id, tag_id):
+def persist_status_interest_relation(status_id, interest_id):
     """
-    Persist a relation between status and tag.
+    Persist a relation between status and interest.
 
     param status_id: The id of the status.
-    param tag_id: The id of the tag.
+    param interest_id: The id of the interest.
     return: Boolean.
     """
     cur = conn.cursor()
     cur.execute(
         """
-        INSERT INTO statuses_tags (status_id, tag_id) 
+        INSERT INTO interests_statuses (status_id, interest_id)
         VALUES (%s, %s)
-        ON CONFLICT (status_id, tag_id) DO NOTHING;
+        ON CONFLICT (status_id, interest_id) DO NOTHING;
         """,
         (
             status_id,
-            tag_id,
+            interest_id,
         ),
     )
     conn.commit()
     cur.close()
     return True
-
 
 def get_status_by_id(status_id):
     """
@@ -81,16 +80,16 @@ def get_statuses_by_account_id(account_id):
     return [status[0] for status in statuses]
 
 
-def get_status_with_tag_ids_and_stats_by_status_id(status_id):
+def get_status_with_interest_ids_and_stats_by_status_id(status_id):
     """
-    Get status with joined tag ids by id.
+    Get status with joined interest ids by id.
 
     param status_id: The id of the status.
-    return: A specific status by id with joined tag_id as list.
+    return: A specific status by id with joined interest_id as list.
     """
     cur = conn.cursor()
     cur.execute(
-        "SELECT statuses.*, array_agg(statuses_tags.tag_id) AS tag_ids, status_stats.replies_count, status_stats.reblogs_count, status_stats.favourites_count FROM statuses LEFT JOIN statuses_tags ON statuses.id = statuses_tags.status_id LEFT JOIN status_stats ON statuses.id = status_stats.status_id WHERE statuses.id = %s GROUP BY statuses.id, status_stats.reblogs_count, status_stats.favourites_count, status_stats.replies_count;",
+        "SELECT statuses.*, array_agg(interests_statuses.interest_id) AS interest_ids, status_stats.replies_count, status_stats.reblogs_count, status_stats.favourites_count FROM statuses LEFT JOIN interests_statuses ON statuses.id = interests_statuses.status_id LEFT JOIN status_stats ON statuses.id = status_stats.status_id WHERE statuses.id = %s GROUP BY statuses.id, status_stats.reblogs_count, status_stats.favourites_count, status_stats.replies_count;",
         (status_id,),
     )
     response = cur.fetchone()

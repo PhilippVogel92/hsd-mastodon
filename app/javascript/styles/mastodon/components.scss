@@ -1080,8 +1080,12 @@ body > [data-popper-placement] {
   cursor: auto;
 
   @keyframes fade {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
   }
 
   opacity: 1;
@@ -1827,11 +1831,11 @@ a.account__display-name {
   justify-content: center;
   flex-direction: column;
   scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none;  /* IE 10+ */
+  -ms-overflow-style: none; /* IE 10+ */
 
   * {
     scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* IE 10+ */
+    -ms-overflow-style: none; /* IE 10+ */
   }
 
   &::-webkit-scrollbar,
@@ -4739,6 +4743,14 @@ a.status-card.compact:hover {
   position: relative;
 }
 
+.interests-title {
+  padding-top: 0;
+}
+
+.interests-container {
+  padding: 20px 20px 10px 20px;
+}
+
 .interests-filter {
   @extend .search;
   display: flex;
@@ -4747,20 +4759,19 @@ a.status-card.compact:hover {
   align-items: center;
   row-gap: 5px;
 
-  .search__input {
-    border: 1px solid lighten($ui-base-color, 8%);
-    background: darken($ui-base-color, 2%);
-  }
-
   .search-results__section {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
+    margin: 0;
   }
 
-  .new-hashtag {
-    &,
+  .new-interest {
+    margin: 10px 0;
+    text-align: center;
+
     p {
-      margin-bottom: 5px;
+      margin-bottom: 10px;
     }
 
     .button {
@@ -4768,15 +4779,61 @@ a.status-card.compact:hover {
     }
   }
 
-  .interests-hashtag {
+  .followed-hashtags {
+    margin-top: 10px;
+    width: 100%;
+
+    h4 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-weight: bold;
+      font-size: 1.3em;
+    }
+  }
+
+  p {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+}
+
+.detailed-status__interests {
+  display: flex;
+  margin-top: 10px;
+}
+
+.interests-filter, .detailed-status__interests {
+  .interest {
     display: flex;
     align-items: center;
-    cursor: pointer;
-    margin: 10px;
     padding: 5px 10px;
     border: 1px solid lighten($ui-base-color, 8%);
     border-radius: 4px;
+  }
+}
 
+.detailed-status__interests {
+  .interest {
+    background: lighten($ui-base-color, 8%);
+    margin-right: 10px;
+    cursor: default;
+  }
+}
+
+.detailed-status__wrapper {
+  &:focus {
+    .detailed-status__interests {
+      .interest {
+        background: $ui-base-color;
+      }
+    }
+  }
+}
+
+.interests-filter {
+  .interest {
+    cursor: pointer;
+    margin: 10px;
     &:hover,
     &.followed {
       background: lighten($ui-base-color, 8%);
@@ -6685,9 +6742,15 @@ noscript {
 }
 
 @keyframes flicker {
-  0% { opacity: 1; }
-  30% { opacity: 0.75; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @media screen and (max-width: 630px) and (max-height: 400px) {
@@ -6719,16 +6782,14 @@ noscript {
     .navigation-bar__actions {
       & > .icon-button.close {
         will-change: opacity transform;
-        transition:
-          opacity $duration * 0.5 $delay,
-          transform $duration $delay;
+        transition: opacity $duration * 0.5 $delay,
+        transform $duration $delay;
       }
 
       & > .compose__action-bar .icon-button {
         will-change: opacity transform;
-        transition:
-          opacity $duration * 0.5 $delay + $duration * 0.5,
-          transform $duration $delay;
+        transition: opacity $duration * 0.5 $delay + $duration * 0.5,
+        transform $duration $delay;
       }
     }
   }

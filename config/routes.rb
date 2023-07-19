@@ -697,6 +697,17 @@ Rails.application.routes.draw do
       end
     end
 
+    namespace :hsd do
+      resources :followed_interests, only: [:index]
+      get "/interests/search", to: "interests#search"
+      resources :interests, only: [:show] do
+        member do
+          post :follow
+          post :unfollow
+        end
+      end
+    end
+
     namespace :web do
       resource :settings, only: [:update]
       resource :embed, only: [:create]

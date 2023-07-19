@@ -154,6 +154,11 @@ class Tag < ApplicationRecord
     def normalize(str)
       HashtagNormalizer.new.normalize(str)
     end
+
+    def by_account_interests(interest_ids)
+      interest_names = Interest.find(interest_ids).pluck(:name)
+      Tag.where(name: interest_names)
+    end
   end
 
   private

@@ -1,0 +1,62 @@
+Triggered interest modelling for status: 110723257452191851
+Triggered interest modelling for status: 110723260459127798
+Triggered interest modelling for status: 110723275212027416
+Zeitaufwand: 0.048300743103027344 / Status: test baum / Preprocessed Text: Test Baum / Matches: [('test', 'test', 1.0, 1)]
+Triggered interest modelling for status: 110723278657718957
+Zeitaufwand: 0.04106593132019043 / Status: Der Baum ist groß. / Preprocessed Text: Baum / Matches: []
+Triggered interest modelling for status: 110723280294035850
+Zeitaufwand: 0.03053116798400879 / Status: Die Natur ist toll. / Preprocessed Text: Natur toll / Matches: [('natur', 'natur', 1.0, 4), ('landschaft', 'natur', 0.6113209760873612, 5)]
+Triggered interest modelling for status: 110723509214705054
+Zeitaufwand: 0.08580565452575684 / Status: Ich entwickel gerne Software mit anderen Entwicklern im Team. Der Code ist so meist viel sturkturierter. / Preprocessed Text: entwickeln gerne Software Entwickler Team Code meist Sturkturierter / Matches: [('software', 'software', 1.0, 21), ('entwickler', 'entwickler', 1.0, 20), ('entwickler', 'entwickeln', 0.640885324632248, 20)]
+Triggered interest modelling for status: 110723514487901394
+Zeitaufwand: 0.07439446449279785 / Status: Ich entwickel gerne Software mit anderen Entwicklern im Team. Der Code ist so meist viel sturkturierter. / Preprocessed Text: entwickeln gerne Software Entwickler Team Code meist Sturkturierter / Matches: [('software', 'software', 1.0, 21), ('entwickler', 'entwickler', 1.0, 20), ('entwickler', 'entwickeln', 0.640885324632248, 20)]
+Triggered interest modelling for status: 110723523483827458
+Zeitaufwand: 0.030710458755493164 / Status: @benling dnoajond / Preprocessed Text: Dnoajond / Matches: []
+Triggered interest modelling for status: 110723528649770759
+Zeitaufwand: 0.03338289260864258 / Status: der baum ist toll so in der landschaft. / Preprocessed Text: Baum toll Landschaft / Matches: [('landschaft', 'landschaft', 1.0, 5), ('natur', 'landschaft', 0.6113209760873612, 4)]
+Triggered interest modelling for status: 110724030114184564
+Zeitaufwand: 0.5044119358062744 / Status: Basketball ist ein toller Sport! / Preprocessed Text: Basketball toll Sport / Matches: [('basketball', 'basketball', 1.0, 1), ('handball', 'basketball', 0.8017132600305017, 96), ('tennis', 'basketball', 0.7897173356681195, 42)]
+Triggered interest modelling for status: 110724103363451046
+Zeitaufwand: 0.29198408126831055 / Status: Ich mag Züge. / Preprocessed Text: züge / Matches: []
+Triggered interest modelling for status: 110724106286664732
+Zeitaufwand: 0.5027716159820557 / Status: Autos sind Verkehrsmittel. / Preprocessed Text: Auto Verkehrsmittel / Matches: [('motor', 'auto', 0.6676649557413707, 427)]
+Triggered interest modelling for status: 110724112235772274
+Zeitaufwand: 0.2587699890136719 / Status: Ich mag Züge. #train / Preprocessed Text: züge Train / Matches: []
+Triggered interest modelling for status: 110724114804168582
+Zeitaufwand: 0.837590217590332 / Status: Pumas sind große Katze. Sind sind aber kleiner als Löwen. #wildtier / Preprocessed Text: Pumas Katze Löwen Wildtier / Matches: []
+Triggered interest modelling for status: 110724117081902384
+Zeitaufwand: 1.4927904605865479 / Status: In der Natur gibt es viele Tiere. Das nennt sich Flora. Ich würde gerne mal eine DataScience Projekt in dieser Richtung machen, / Preprocessed Text: Natur Tier nennen Flora gerne mal Datascience Projekt Richtung / Matches: [('natur', 'natur', 1.0, 9), ('einigung', 'richtung', 0.6195131361852527, 411), ('konstanz', 'richtung', 0.6154156875286645, 664)]
+Triggered interest modelling for status: 110724180645174147
+Zeitaufwand: 0.4493532180786133 / Status: datascience macht spaß / Preprocessed Text: Datascience Spaß / Matches: []
+Triggered interest modelling for status: 110724183418244847
+Zeitaufwand: 0.4079625606536865 / Status: datascience macht spaß / Preprocessed Text: Datascience Spaß / Matches: [('datascience', 'datascience', 1.0, 1353)]
+Triggered interest modelling for status: 110724241215143932
+Zeitaufwand: 0.7472000122070312 / Status: der baum steht in der natur / Preprocessed Text: Baum stehen Natur / Matches: [('natur', 'natur', 1.0, 9), ('landschaft', 'natur', 0.6113209760873612, 676)]
+Triggered interest modelling for status: 110724245244513102
+Triggered interest modelling for status: 110724249288306530
+Triggered interest modelling for status: 110724251675453009
+Zeitaufwand: 0.7107961177825928 / Status: der baum steht in der natur / Preprocessed Text: Baum stehen Natur / Matches: [('natur', 'natur', 1.0, 9), ('landschaft', 'natur', 0.6113209760873612, 676)]
+Triggered interest modelling for status: 110725643791947518
+Zeitaufwand: 0.2962496280670166 / Status: test / Preprocessed Text: Test / Matches: [('test', 'test', 1.0, 11)]
+Triggered interest modelling for status: 110725737581836626
+Zeitaufwand: 0.26354432106018066 / Status: test / Preprocessed Text: Test / Matches: [('test', 'test', 1.0, 11)]
+Triggered interest modelling for status: 110725741232880136
+Zeitaufwand: 0.21274733543395996 / Status: gfdg / Preprocessed Text: Gfdg / Matches: []
+Triggered interest modelling for status: 110725745631437064
+Zeitaufwand: 0.3392314910888672 / Status: hfh / Preprocessed Text: Hfh / Matches: []
+Triggered interest modelling for status: 110739058088397573
+Zeitaufwand: 0.3291358947753906 / Status: test / Preprocessed Text: Test / Matches: [('test', 'test', 1.0, 11)]
+Triggered interest modelling for status: 110739060526099352
+Zeitaufwand: 0.3023796081542969 / Status: test / Preprocessed Text: Test / Matches: [('test', 'test', 1.0, 11)]
+Triggered interest modelling for status: 110739065176473347
+Zeitaufwand: 0.45388245582580566 / Status: test / Preprocessed Text: Test / Matches: [('test', 'test', 1.0, 11)]
+Triggered interest modelling for status: 110739070347054720
+Zeitaufwand: 0.3006606101989746 / Status: test / Preprocessed Text: Test / Matches: [('test', 'test', 1.0, 11)]
+Triggered interest modelling for status: 110739072212866850
+Zeitaufwand: 0.3135948181152344 / Status: test / Preprocessed Text: Test / Matches: [('test', 'test', 1.0, 11)]
+Triggered interest modelling for status: 110739077101131076
+Zeitaufwand: 0.4765143394470215 / Status: test / Preprocessed Text: Test / Matches: [('test', 'test', 1.0, 11)]
+Triggered interest modelling for status: 110739082711612829
+Zeitaufwand: 0.23015952110290527 / Status: test / Preprocessed Text: Test / Matches: [('test', 'test', 1.0, 11)]
+Triggered interest modelling for status: 110739093962530757
+Zeitaufwand: 0.17314577102661133 / Status: ich mag das #datascience / Preprocessed Text: Datascience / Matches: [('datascience', 'datascience', 1.0, 1353)]

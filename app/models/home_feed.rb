@@ -25,21 +25,47 @@ class HomeFeed < Feed
   end
 
   def from_redis_recommender(limit, max_id, since_id, status_count)
-    interests_for_account = InterestFollow.by_account(@account.id).ids
+    interests_for_account = InterestFollow.by_account(@account.id).pluck(:interest_id)
     statuses_by_account_interests = Status.by_interests(interests_for_account).ids
     # todo get tags by interest names
-    interest_tags_for_account = TagFollow.by_account(@account.id).ids
-    Rails.logger.debug("")
-    Rails.logger.debug("")
-    Rails.logger.debug(interest_tags_for_account)
-    Rails.logger.debug("")
-    Rails.logger.debug("")
-    Rails.logger.debug("")
-    statuses_by_account_interest_tags = Status.by_interests(interest_tags_for_account).ids
+    interest_tags_for_account = Tag.by_account_interests(interests_for_account).ids
+    statuses_by_interest_tags = Status.tagged_with(interest_tags_for_account).ids
+    recommender_pooling_statuses = statuses_by_account_interests.union(statuses_by_interest_tags)
+
     recommender_feed_key = key_recommender
     if redis.exists(recommender_feed_key).zero?
       home_feed_ids = redis.zrevrangebyscore(key, '(+inf', '(-inf').map(&:to_i)
-      home_feed_ids = home_feed_ids.union(statuses_by_account_interests)
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug(home_feed_ids.count)
+      Rails.logger.debug(recommender_pooling_statuses.count)
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      home_feed_ids = home_feed_ids.union(recommender_pooling_statuses)
+
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug(home_feed_ids.count)
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
+      Rails.logger.debug("")
       recommended_toots = get_recommendations(home_feed_ids)
       return [] if recommended_toots.empty?
       redis.rpush(recommender_feed_key, recommended_toots)

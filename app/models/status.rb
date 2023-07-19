@@ -71,6 +71,7 @@ class Status < ApplicationRecord
   has_many :media_attachments, dependent: :nullify
 
   has_and_belongs_to_many :tags
+  has_and_belongs_to_many :interests
   has_and_belongs_to_many :preview_cards
 
   has_one :notification, as: :activity, dependent: :destroy
@@ -109,6 +110,9 @@ class Status < ApplicationRecord
   scope :tagged_with_none, ->(tag_ids) {
     where('NOT EXISTS (SELECT * FROM statuses_tags forbidden WHERE forbidden.status_id = statuses.id AND forbidden.tag_id IN (?))', tag_ids)
   }
+
+  scope :by_interests, ->(interest_ids) { joins(:interests_statuses).where('interests_statuses.interest_id IN (?)', interest_ids) }
+
 
   cache_associated :application,
                    :media_attachments,

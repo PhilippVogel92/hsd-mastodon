@@ -2,9 +2,9 @@ import pandas as pd
 import numpy as np
 from collections import defaultdict
 from recommender_api.model.status_queries import (
-    get_status_with_tag_ids_and_stats_by_status_id,
+    get_status_with_interest_ids_and_stats_by_status_id,
 )
-from recommender_api.model.tag_queries import get_tags_by_account_id
+from recommender_api.model.interest_queries import get_interests_by_account_id
 from recommender_api.model.account_queries import get_followed_accounts, get_blocked_accounts, get_muted_accounts
 
 
@@ -30,7 +30,7 @@ class RankingSystem:
 
     # flat boosts added to ranking score, if they apply
     boost_for_following = 0.2
-    boost_for_tags = 0.2
+    boost_for_interests = 0.2
     boost_for_blocked = -1000
 
     # number of allowed statuses from the same account in the timeline, more than that will be removed
@@ -42,26 +42,26 @@ class RankingSystem:
     def __init__(self):
         pass
 
-    def count_account_tags_in_status(self, status, tag_ids_from_account):
+    def count_account_interests_in_status(self, status, interest_ids_from_account):
         """
-        Function to check if the tags of an account are in a status.
-        param status: A specific status by id with joined tag_id and stats.
-        param tag_ids_from_account: A list of tag ids from an account.
-        return: True if the tags of an account are in a status, else False.
+        Function to check if the interests of an account are in a status.
+        param status: A specific status by id with joined interest_id and stats.
+        param interest_ids_from_account: A list of interest ids from an account.
+        return: True if the interests of an account are in a status, else False.
         """
-        number_of_status_tags_in_account_tags = 0
+        number_of_status_interests_in_account_interests = 0
 
-        for tag_id in status["tag_ids"]:
-            if tag_id and tag_id in tag_ids_from_account:
-                number_of_status_tags_in_account_tags += 1
-                print(tag_id, "is in account tags")
+        for interest_id in status["interest_ids"]:
+            if interest_id and interest_id in interest_ids_from_account:
+                number_of_status_interests_in_account_interests += 1
+                print(interest_id, "is in account interests")
 
-        return number_of_status_tags_in_account_tags
+        return number_of_status_interests_in_account_interests
 
     def check_if_author_is_followed(self, status, following_list):
         """
         Function to check if the author of a status is in the account's following list.
-        param status: A specific status by id with joined tag_id and stats.
+        param status: A specific status by id with joined interest_id and stats.
         param account_id: The id of an account.
         return: True if the author of a status is in the account's following list, else False.
         """
@@ -75,7 +75,7 @@ class RankingSystem:
     def check_if_author_is_blocked(self, status, blocked_list):
         """
         Function to check if the author of a status is in the account's blocked list.
-        param status: A specific status by id with joined tag_id and stats.
+        param status: A specific status by id with joined interest_id and stats.
         param account_id: The id of an account.
         return: True if the author of a status is in the account's blocked list, else False.
         """
@@ -90,7 +90,7 @@ class RankingSystem:
     def check_if_author_is_muted(self, status, muted_list):
         """
         Function to check if the author of a status is in the account's muted list.
-        param status: A specific status by id with joined tag_id and stats.
+        param status: A specific status by id with joined interest_id and stats.
         param account_id: The id of an account.
         return: True if the author of a status is in the account's muted list, else False.
         """
@@ -122,7 +122,7 @@ class RankingSystem:
     def calculate_ranking_score(
         self,
         status,
-        tag_ids_from_account,
+        interest_ids_from_account,
         following_list,
         muted_list,
         blocked_list,
@@ -130,7 +130,7 @@ class RankingSystem:
         """
         Function to calculate the ranking score of a status.
 
-        :param status: A specific status by id with joined tag_id and stats.
+        :param status: A specific status by id with joined interest_id and stats.
         :param weight_for_favourites_count: Weight for favourites count.
         :param weight_for_replies_count: Weight for replies count.
         :param weight_for_reblogs_count: Weight for reblogs count.
@@ -157,9 +157,9 @@ class RankingSystem:
         # calculate ranking score based on weighted interactions
         ranking_score = replies_score + favourites_score + reblogs_score
 
-        # add boost if status contains followed hashtags
-        if tag_ids_from_account:
-            ranking_score += self.count_account_tags_in_status(status, tag_ids_from_account) * self.boost_for_tags
+        # add boost if status contains followed interests
+        if interest_ids_from_account:
+            ranking_score += self.count_account_interests_in_status(status, interest_ids_from_account) * self.boost_for_interests
 
         # add boost if user follows th status author
         if self.check_if_author_is_followed(status, following_list):
@@ -221,27 +221,27 @@ class RankingSystem:
 
     def sort_timeline(self, account_id, status_ids):
         """Function to sort the timeline of a account by ranking score.
-        param account_id: The id of the account. The statuses will be sorted by the tags of the account.
+        param account_id: The id of the account. The statuses will be sorted by the interests of the account.
         param status_ids: The ids of the statuses.
         param ranking_score_threshold: The threshold for the ranking score. Statuses with a lower ranking score will be filtered out.
         return: A list of sorted status ids by ranking score.
         """
 
-        # Get stat,uses with tag ids and stats
-        statuses_with_tag_ids_and_stats = [
-            get_status_with_tag_ids_and_stats_by_status_id(status_id) for status_id in status_ids
+        # Get stat,uses with interest ids and stats
+        statuses_with_interest_ids_and_stats = [
+            get_status_with_interest_ids_and_stats_by_status_id(status_id) for status_id in status_ids
         ]
 
-        # Get tag ids, following list, muted list and blocked list from account
-        tag_ids_from_account = get_tags_by_account_id(account_id)
+        # Get interest ids, following list, muted list and blocked list from account
+        interest_ids_from_account = get_interests_by_account_id(account_id)
         following_list = get_followed_accounts(account_id)
         muted_list = get_muted_accounts(account_id)
         blocked_list = get_blocked_accounts(account_id)
 
         # Calculate ranking score for each status
         ranked_statuses = [
-            self.calculate_ranking_score(status, tag_ids_from_account, following_list, muted_list, blocked_list)
-            for status in statuses_with_tag_ids_and_stats
+            self.calculate_ranking_score(status, interest_ids_from_account, following_list, muted_list, blocked_list)
+            for status in statuses_with_interest_ids_and_stats
         ]
 
         # Filter out statuses from the same account

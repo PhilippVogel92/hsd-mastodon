@@ -1,14 +1,14 @@
 from .preprocessing import TextPreprocessor
-from ..model.status_queries import persist_status_tag_relation
-from ..model.tag_queries import get_all_tags_with_name_and_id, get_tags_by_status_id
+from ..model.status_queries import persist_status_interest_relation
+from ..model.interest_queries import get_all_interests_with_name_and_id, get_interests_by_status_id, set_last_status_at
 from langdetect import detect
 import time
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-class TagGenerator:
-    """Class to extract keywords from a text and compare them with hashtags."""
+class InterestGenerator:
+    """Class to extract keywords from a text and compare them with interests."""
 
     def __init__(self, status, nlp_model_loader, treshold=0.6):
         self.nlp_model_loader = nlp_model_loader
@@ -59,11 +59,11 @@ class TagGenerator:
 
         return matches """
 
-    def match_hashtags_with_status(self, hashtags):
+    def match_interests_with_status(self, interests):
         """
-        Function to match hashtags with text.
-        Params: hashtags: List of hashtags from database.
-        Return: List of hashtags which match with the text.
+        Function to match interests with text.
+        Params: interests: List of interests from database.
+        Return: List of interests which match with the text.
         """
         persisted_relations = []
         status_text = self.status["preprocessed_content"]
@@ -71,10 +71,10 @@ class TagGenerator:
         keywords = self.extract_keywords(status_text)
         matches = []
         for keyword_doc in self.nlp.pipe(keywords):
-            for hashtag_doc, hashtag_id in self.nlp.pipe(hashtags, as_tuples=True):
-                similarity = keyword_doc.similarity(hashtag_doc)
+            for interest_doc, interest_id in self.nlp.pipe(interests, as_tuples=True):
+                similarity = keyword_doc.similarity(interest_doc)
                 if similarity >= self.treshold:
-                    matches.append((hashtag_doc.text, keyword_doc.text, similarity, hashtag_id))
+                    matches.append((interest_doc.text, keyword_doc.text, similarity, interest_id))
 
         # Sort matches by similarity in descending order and keep only the top 3
         matches.sort(key=lambda x: x[2], reverse=True)
@@ -82,10 +82,11 @@ class TagGenerator:
 
         # Persist the top 3 matches
         for match in top_3_matches:
-            hashtag_id = match[3]
-            if (status_id, hashtag_id) not in persisted_relations:
-                persist_status_tag_relation(status_id, hashtag_id)
-                persisted_relations.append((status_id, hashtag_id))
+            interest_id = match[3]
+            if (status_id, interest_id) not in persisted_relations:
+                persist_status_interest_relation(status_id, interest_id)
+                set_last_status_at(interest_id)
+                persisted_relations.append((status_id, interest_id))
 
         return top_3_matches
 
@@ -114,26 +115,26 @@ class TagGenerator:
                 if similarity >= self.treshold:
                     hashtag_id = hashtag[1]
                     if (status_id, hashtag_id) not in persisted_relations:
-                        persist_status_tag_relation(status_id, hashtag_id)
+                        persist_status_interest_relation(status_id, hashtag_id)
                         persisted_relations.append((status_id, hashtag_id))
                         matches.append((hashtag[0], keyword, similarity))
         return matches
 
-    def generate_hashtags(self):
-        """Function to generate hashtags for a status."""
+    def generate_interests(self):
+        """Function to generate interests for a status."""
 
         # statuses from other instances should not be processed
         if not self.status["local"]:
-            return "Status is not local. Hashtags will not be generated."
+            return "Status is not local. Interests will not be generated."
 
-        with open("log_hashtag_modelling.txt", "a") as f:
-            print("Triggered hashtag modelling for status:", self.status["id"], file=f)
+        with open("log_interests_modelling.txt", "a") as f:
+            print("Triggered interest modelling for status:", self.status["id"], file=f)
 
         start = time.time()
 
-        hashtags = get_all_tags_with_name_and_id()
-        status_tags = get_tags_by_status_id(self.status["id"])
-        hashtags = [hashtag for hashtag in hashtags if hashtag[0] not in status_tags]
+        interests = get_all_interests_with_name_and_id()
+        status_interests = get_interests_by_status_id(self.status["id"])
+        interests = [interest for interest in interests if interest[0] not in status_interests]
 
         # initialize text preprocessor
         nlp_model_name = self.nlp.meta["lang"] + "_" + self.nlp.meta["name"]
@@ -141,13 +142,13 @@ class TagGenerator:
         self.status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(self.status["text"])
 
         # extract keywords from text
-        matches = self.match_hashtags_with_status(hashtags)
+        matches = self.match_interests_with_status(interests)
 
         end = time.time()
         diff = end - start
 
         # safe all print statements in a file
-        with open("log_hashtag_modelling.txt", "a") as f:
+        with open("log_interests_modelling.txt", "a") as f:
             print(
                 "Zeitaufwand:",
                 diff,

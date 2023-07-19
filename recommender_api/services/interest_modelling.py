@@ -53,9 +53,9 @@ class InterestGenerator:
         status_id = self.status["id"]
         keywords = self.extract_keywords(status_text)
         matches = []
-        
+
         start_time = time.time()
-        max_duration = 50 # Setze die maximale Dauer auf 50 Sekunden
+        max_duration = 29  # Setze die maximale Dauer auf 50 Sekunden
 
         for keyword_doc in self.nlp.pipe(keywords):
             for interest_doc, interest_id in self.nlp.pipe(interests, as_tuples=True):
@@ -69,7 +69,6 @@ class InterestGenerator:
                 continue
             break
 
-                
         # Sort matches by similarity in descending order and keep only the top 3
         matches.sort(key=lambda x: x[2], reverse=True)
         top_3_matches = matches[:3]

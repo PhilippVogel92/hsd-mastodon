@@ -18,8 +18,6 @@ ranking_system = RankingSystem()
 @recommender_route.route("/accounts/<account_id>/create-sorted-timeline", methods=["POST"])
 def sort_timeline(account_id):
     user_input = request.get_json()
-    print(user_input)
-
     try:
         dto = UserInputDTO(**user_input)
     except TypeError:

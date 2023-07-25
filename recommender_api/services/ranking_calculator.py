@@ -1,64 +1,9 @@
 import pandas as pd
 import numpy as np
-from collections import defaultdict
-from recommender_api.model.status_queries import (
-    get_status_with_interest_ids_and_stats_by_status_id,
-)
-from recommender_api.model.interest_queries import get_interests_by_account_id
-from recommender_api.model.account_queries import get_followed_accounts, get_blocked_accounts, get_muted_accounts
-
-class RankingSystem:
-    def __init__(self):
-        self.ranking_calculator = RankingCalculator()
-        self.status_filter = StatusFilter()
-        self.status_sorter = StatusSorter()
-
-    def calculate_ranking_score(self, status, interest_ids_from_account, following_list, muted_list, blocked_list):
-        return self.ranking_calculator.calculate_ranking_score(status, interest_ids_from_account, following_list, muted_list, blocked_list)
-
-    def promote_author_diversity(self, statuses):
-        return self.status_filter.promote_author_diversity(statuses)
-    
-    def filter_statuses_by_threshold(self, statuses):
-        return self.status_filter.filter_statuses_by_threshold(statuses)
-
-    def sort_statuses_by_ranking_score(self, statuses):
-        return self.status_sorter.sort_statuses_by_ranking_score(statuses)
-
-    def sort_timeline(self, account_id, status_ids):
-        """Function to sort the timeline of a account by ranking score.
-        param account_id: The id of the account. The statuses will be sorted by the interests of the account.
-        param status_ids: The ids of the statuses.
-        param ranking_score_threshold: The threshold for the ranking score. Statuses with a lower ranking score will be filtered out.
-        return: A list of sorted status ids by ranking score.
-        """
-
-        # Get stat,uses with interest ids and stats
-        statuses_with_interest_ids_and_stats = [
-            get_status_with_interest_ids_and_stats_by_status_id(status_id) for status_id in status_ids
-        ]
-
-        # Get interest ids, following list, muted list and blocked list from account
-        interest_ids_from_account = get_interests_by_account_id(account_id)
-        following_list = get_followed_accounts(account_id)
-        muted_list = get_muted_accounts(account_id)
-        blocked_list = get_blocked_accounts(account_id)
-        
-        ranked_statuses = [
-            self.calculate_ranking_score(status, interest_ids_from_account, following_list, muted_list, blocked_list) for status in statuses_with_interest_ids_and_stats
-        ]
-
-        ranked_and_filtered_statuses = self.promote_author_diversity(ranked_statuses)
-        ranked_and_filtered_statuses = self.filter_statuses_by_threshold(ranked_and_filtered_statuses)
-        
-        sorted_statuses = self.sort_statuses_by_ranking_score(ranked_and_filtered_statuses)
-
-        sorted_statuses_ids = [status["id"] for status in sorted_statuses]
-
-        return sorted_statuses_ids
-
 
 class RankingCalculator:
+    """ Calculates the ranking score of a given status for a specific account."""
+
     # if we might gain more users, we can scale the ranking score with this factor
     # low values cause higher variance on low interaction counts
     scalibility_factor = 1.0
@@ -93,7 +38,6 @@ class RankingCalculator:
         for interest_id in status["interest_ids"]:
             if interest_id and interest_id in interest_ids_from_account:
                 number_of_status_interests_in_account_interests += 1
-                print(interest_id, "is in account interests")
 
         return number_of_status_interests_in_account_interests
 
@@ -108,7 +52,7 @@ class RankingCalculator:
         author_id = status["account_id"]
         if author_id in following_list:
             is_followed = True
-            print("author with id:", author_id, "is followed")
+
         return is_followed
 
     def check_if_author_is_blocked(self, status, blocked_list):
@@ -122,7 +66,6 @@ class RankingCalculator:
         author_id = status["account_id"]
         if author_id in blocked_list:
             is_blocked = True
-            print("author with id:", author_id, "is blocked")
 
         return is_blocked
 
@@ -137,7 +80,6 @@ class RankingCalculator:
         author_id = status["account_id"]
         if author_id in muted_list:
             is_muted = True
-            print("author with id:", author_id, "is muted")
 
         return is_muted
 
@@ -219,44 +161,3 @@ class RankingCalculator:
         status["ranking_score"] = ranking_score
 
         return status
-
-class StatusFilter:    
-    def filter_statuses_by_threshold(self, ranked_statuses, ranking_score_threshold):
-        """Function to filter out statuses with a lower ranking score than the threshold.
-        param ranked_statuses: A list of statuses with ranking score.
-        param ranking_score_threshold: The threshold for the ranking score. Statuses with a lower ranking score will be filtered out.
-        return: A list of statuses with ranking score higher than the threshold.
-        """
-        filtered_statuses = [status for status in ranked_statuses if status["ranking_score"] > ranking_score_threshold]
-        return filtered_statuses
-
-    def promote_author_diversity(self, statuses, number_of_allowed_status_from_same_account):
-        """Function to promote author diversity.
-        param statuses: A list of statuses with ranking score.
-        param number_of_allowed_status_from_same_account: The number of statuses from the same account that are allowed.
-        return: A list of statuses with ranking score."""
-
-        filtered_statuses = []
-        date_statuses = defaultdict(list)
-        for status in statuses:
-            date = status['created_at'].date()
-            date_statuses[date].append(status)
-        for date, statuses in date_statuses.items():
-            statuses.sort(key=lambda x: x['ranking_score'], reverse=True)
-            authors = defaultdict(int)
-            for status in statuses:
-                if authors[status['account_id']] < number_of_allowed_status_from_same_account:
-                    filtered_statuses.append(status)
-                    authors[status['account_id']] += 1
-        return filtered_statuses
-
-class StatusSorter:
-    def sort_statuses_by_ranking_score(self, statuses):
-        """Function to sort statuses by ranking score.
-        param statuses: A list of statuses with ranking score.
-        return: A list of sorted status ids by ranking score."""
-
-        # Sort statuses by ranking score
-        sorted_statuses = sorted(statuses, key=lambda x: x["ranking_score"], reverse=True)
-
-        return sorted_statuses

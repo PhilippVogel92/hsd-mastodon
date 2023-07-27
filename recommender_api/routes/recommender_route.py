@@ -1,9 +1,9 @@
 from flask import Blueprint, jsonify, request, abort
 from ..model.status_queries import get_status_by_id
 
-from recommender_api.services.ranking_system import RankingSystem
-from recommender_api.services.interest_modelling import InterestGenerator
-from recommender_api.services.nlp_model_loader import NLPModelLoader
+from recommender_api.ranking_system.ranking_system import RankingSystem
+from recommender_api.interest_generator.interest_modelling import InterestGenerator
+from recommender_api.interest_generator.nlp_model_loader import NLPModelLoader
 from recommender_api.dto.user_input_dto import UserInputDTO
 
 recommender_route = Blueprint("recommender_route", __name__)

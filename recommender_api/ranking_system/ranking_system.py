@@ -3,9 +3,9 @@ from recommender_api.model.status_queries import (
 )
 from recommender_api.model.interest_queries import get_interests_by_account_id
 from recommender_api.model.account_queries import get_followed_accounts, get_blocked_accounts, get_muted_accounts
-from recommender_api.services.status_filter import StatusFilter
-from recommender_api.services.status_sorter import StatusSorter
-from recommender_api.services.ranking_calculator import RankingCalculator
+from .status_filter import StatusFilter
+from .status_sorter import StatusSorter
+from .ranking_calculator import RankingCalculator
 
 class RankingSystem:
     """

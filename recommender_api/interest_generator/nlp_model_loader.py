@@ -1,6 +1,5 @@
 import spacy
 
-
 class NLPModelLoader:
     """Class to load and manage NLP models."""
 

@@ -1,7 +1,6 @@
 import re
 import html2text
 
-
 class TextPreprocessor:
     """Class to preprocess text data."""
 

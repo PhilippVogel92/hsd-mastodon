@@ -1,20 +1,21 @@
 from .preprocessing import TextPreprocessor
-from ..model.status_queries import persist_status_interest_relation
-from ..model.interest_queries import get_all_interests_with_name_and_id, get_interests_by_status_id, set_last_status_at
+from ..model.status_queries import persist_status_interest_relation, get_status_by_id
+from ..model.interest_queries import get_all_interests_with_name_and_id, set_last_status_at
 from langdetect import detect
 import time
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+from flask import abort
+
 
 
 class InterestGenerator:
     """Class to extract keywords from a text and compare them with interests."""
 
-    def __init__(self, status, nlp_model_loader, treshold=0.6):
+    def __init__(self, status_id, nlp_model_loader, threshold=0.6):
         self.nlp_model_loader = nlp_model_loader
-        self.nlp = self.choose_nlp_model(status)
-        self.treshold = treshold
-        self.status = status
+        self.threshold = threshold
+        self.status_id = status_id
+        self.status = ""
+        self.nlp = ""
 
     def choose_nlp_model(self, status):
         """Function to choose the right NLP model."""
@@ -63,7 +64,7 @@ class InterestGenerator:
                 if time.time() - start_time > max_duration:
                     break
                 similarity = keyword_doc.similarity(interest_doc)
-                if similarity >= self.treshold:
+                if similarity >= self.threshold:
                     matches.append((interest_doc.text, keyword_doc.text, similarity, interest_id))
             else:
                 continue
@@ -83,40 +84,14 @@ class InterestGenerator:
 
         return top_3_matches
 
-    def match_hashtags_with_status_tfidf(self, hashtags):
-        """
-        Function to match hashtags with text and persist the relations.
-        Params: hashtags: List of hashtags from database.
-        """
-        persisted_relations = []
-        status_text = self.status["preprocessed_content"]
-        status_id = self.status["id"]
-        keywords = self.extract_keywords(status_text)
-        matches = []
-
-        # Compute cosine similarity between keywords and hashtags
-        vectorizer = TfidfVectorizer()
-        hashtag_names = [hashtag[0] for hashtag in hashtags]
-        hashtag_tfidf = vectorizer.fit_transform(hashtag_names)
-        keyword_tfidf = vectorizer.transform(keywords)
-        similarities = cosine_similarity(keyword_tfidf, hashtag_tfidf)
-
-        # Select hashtags with similarity above threshold
-        for i, keyword in enumerate(keywords):
-            for j, hashtag in enumerate(hashtags):
-                similarity = similarities[i, j]
-                if similarity >= self.treshold:
-                    hashtag_id = hashtag[1]
-                    if (status_id, hashtag_id) not in persisted_relations:
-                        persist_status_interest_relation(status_id, hashtag_id)
-                        persisted_relations.append((status_id, hashtag_id))
-                        matches.append((hashtag[0], keyword, similarity))
-        return matches
-
     def generate_interests(self):
         """Function to generate interests for a status."""
-
-        # statuses from other instances should not be processed
+        try:
+            self.status = get_status_by_id(self.status_id)
+            interests = get_all_interests_with_name_and_id()
+        except IndexError:
+            abort(404)
+        
         if not self.status["local"]:
             return "Status is not local. Interests will not be generated."
 
@@ -125,11 +100,8 @@ class InterestGenerator:
 
         start = time.time()
 
-        interests = get_all_interests_with_name_and_id()
-        status_interests = get_interests_by_status_id(self.status["id"])
-        interests = [interest for interest in interests if interest[0] not in status_interests]
-
         # initialize text preprocessor
+        self.nlp = self.choose_nlp_model(self.status)
         nlp_model_name = self.nlp.meta["lang"] + "_" + self.nlp.meta["name"]
         text_preprocessor = TextPreprocessor(self.nlp_model_loader, nlp_model_name)
         self.status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(self.status["text"])

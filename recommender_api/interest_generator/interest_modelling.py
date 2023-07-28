@@ -92,9 +92,6 @@ class InterestGenerator:
         except IndexError:
             abort(404)
         
-        if not self.status["local"]:
-            return "Status is not local. Interests will not be generated."
-
         with open("log_interests_modelling.txt", "a") as f:
             print("Triggered interest modelling for status:", self.status["id"], file=f)
 

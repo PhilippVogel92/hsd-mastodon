@@ -95,8 +95,7 @@ class InterestGenerator:
 
         # initialize text preprocessor
         self.nlp = self.choose_nlp_model(self.status)
-        nlp_model_name = self.nlp.meta["lang"] + "_" + self.nlp.meta["name"]
-        text_preprocessor = TextPreprocessor(self.nlp_model_loader, nlp_model_name)
+        text_preprocessor = TextPreprocessor(self.nlp)
         self.status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(self.status["text"])
 
         # extract keywords from text
@@ -111,7 +110,7 @@ class InterestGenerator:
                 "Zeitaufwand:",
                 diff,
                 "/ NLP Modell:",
-                nlp_model_name,
+                self.nlp.meta["lang"] + "_" + self.nlp.meta["name"],
                 "/ Status:",
                 self.status["text"],
                 "/ Preprocessed Text:",

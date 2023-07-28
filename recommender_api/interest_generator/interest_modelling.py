@@ -24,11 +24,6 @@ class InterestGenerator:
             nlp_model = "en_core_web_lg"
 
         nlp = self.nlp_model_loader.get_model(nlp_model)
-
-        with open("log_interests_modelling.txt", "a") as f:
-            print("Loaded NLP model:", nlp.meta["lang"] + "_" + nlp.meta["name"])
-
-        # safe all print statements in a file
         return nlp
 
     def extract_keywords(self, text):
@@ -115,6 +110,8 @@ class InterestGenerator:
             print(
                 "Zeitaufwand:",
                 diff,
+                "/ NLP Modell:",
+                nlp_model_name,
                 "/ Status:",
                 self.status["text"],
                 "/ Preprocessed Text:",

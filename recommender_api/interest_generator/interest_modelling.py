@@ -6,7 +6,6 @@ import time
 from flask import abort
 
 
-
 class InterestGenerator:
     """Class to extract keywords from a text and compare them with interests."""
 
@@ -25,14 +24,16 @@ class InterestGenerator:
             nlp_model = "en_core_web_lg"
 
         nlp = self.nlp_model_loader.get_model(nlp_model)
-        print("Loaded NLP model:", nlp.meta["lang"] + "_" + nlp.meta["name"])
+
+        with open("log_interests_modelling.txt", "a") as f:
+            print("Loaded NLP model:", nlp.meta["lang"] + "_" + nlp.meta["name"])
+
         # safe all print statements in a file
         return nlp
 
     def extract_keywords(self, text):
         """Function to extract keywords from a text."""
         doc = self.nlp(text)
-
         keywords = []
 
         # Extract keywords from text
@@ -91,7 +92,7 @@ class InterestGenerator:
             interests = get_all_interests_with_name_and_id()
         except IndexError:
             abort(404)
-        
+
         with open("log_interests_modelling.txt", "a") as f:
             print("Triggered interest modelling for status:", self.status["id"], file=f)
 

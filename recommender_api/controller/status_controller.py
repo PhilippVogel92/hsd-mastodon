@@ -1,5 +1,5 @@
-from recommender_api.interest_generator.interest_modelling import InterestGenerator
-from recommender_api.interest_generator.nlp_model_loader import NLPModelLoader
+from recommender_api.interest_modelling.interest_generator import InterestGenerator
+from recommender_api.interest_modelling.nlp_model_loader import NLPModelLoader
 from flask import jsonify
 
 class StatusController:

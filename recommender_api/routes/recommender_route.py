@@ -12,6 +12,7 @@ nlp_model_loader = NLPModelLoader()
 nlp_model_loader.load_model("en_core_web_lg")
 nlp_model_loader.load_model("de_core_news_lg")
 
+<<<<<<< Updated upstream
 
 #@recommender_route.route("/accounts/<account_id>/recommendations", methods=["POST"]) besser GET
 @recommender_route.route("/accounts/<account_id>/create-sorted-timeline", methods=["POST"])
@@ -31,3 +32,7 @@ def generate_interests_for_status(status_id):
     interest_generator = InterestGenerator(status_id, nlp_model_loader)
     matches = interest_generator.generate_interests()
     return jsonify(matches)
+=======
+#route("/statuses/<status_id>/interests", methods=["PUT"])
+blueprint.route("/statuses/<status_id>/generate-interests", methods=["GET"])(status_controller.generate_interests)
+>>>>>>> Stashed changes

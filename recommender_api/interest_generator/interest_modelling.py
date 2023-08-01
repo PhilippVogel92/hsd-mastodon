@@ -23,9 +23,9 @@ class InterestGenerator:
         nlp_model = self.nlp_model_loader.get_model(nlp_model_name)
         return nlp_model
 
-    def extract_keywords(self, text, nlp):
+    def extract_keywords(self, text, nlp_model):
         """Function to extract keywords from a text."""
-        doc = self.nlp(text)
+        doc = nlp_model(text)
         keywords = []
 
         # Extract keywords from text
@@ -36,15 +36,15 @@ class InterestGenerator:
 
         return keywords
 
-    def match_interests_with_status(self, interests, nlp_model):
+    def match_interests_with_status(self, interests, status, nlp_model):
         """
         Function to match interests with text.
         Params: interests: List of interests from database.
         Return: List of interests which match with the text.
         """
         persisted_relations = []
-        status_text = self.status["preprocessed_content"]
-        status_id = self.status["id"]
+        status_text = status["preprocessed_content"]
+        status_id = status["id"]
         keywords = self.extract_keywords(status_text, nlp_model)
         matches = []
 
@@ -93,10 +93,10 @@ class InterestGenerator:
         # initialize text preprocessor
         nlp_model = self.choose_nlp_model(status)
         text_preprocessor = TextPreprocessor(nlp_model)
-        self.status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(status["text"])
+        status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(status["text"])
 
         # extract keywords from text
-        matches = self.match_interests_with_status(interests, nlp_model)
+        matches = self.match_interests_with_status(interests, status, nlp_model)
 
         end = time.time()
         diff = end - start

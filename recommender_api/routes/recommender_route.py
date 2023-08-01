@@ -13,7 +13,7 @@ nlp_model_loader.load_model("en_core_web_lg")
 nlp_model_loader.load_model("de_core_news_lg")
 
 
-
+#@recommender_route.route("/accounts/<account_id>/recommendations", methods=["POST"]) besser GET
 @recommender_route.route("/accounts/<account_id>/create-sorted-timeline", methods=["POST"])
 def sort_timeline(account_id):
     user_input = request.get_json()
@@ -25,7 +25,7 @@ def sort_timeline(account_id):
     return jsonify(recommendations)
 
 
-
+#@recommender_route.route("/statuses/<status_id>/interests", methods=["PUT"])
 @recommender_route.route("/statuses/<status_id>/generate-interests", methods=["GET"])
 def generate_interests_for_status(status_id):
     interest_generator = InterestGenerator(status_id, nlp_model_loader)

@@ -9,24 +9,21 @@ from flask import abort
 class InterestGenerator:
     """Class to extract keywords from a text and compare them with interests."""
 
-    def __init__(self, status_id, nlp_model_loader, threshold=0.6):
+    def __init__(self, nlp_model_loader, threshold=0.6):
         self.nlp_model_loader = nlp_model_loader
         self.threshold = threshold
-        self.status_id = status_id
-        self.status = ""
-        self.nlp = ""
 
     def choose_nlp_model(self, status):
         """Function to choose the right NLP model."""
         language = detect(status["text"])
-        nlp_model = "de_core_news_lg"
+        nlp_model_name = "de_core_news_lg"
         if language == "en":
-            nlp_model = "en_core_web_lg"
+            nlp_model_name = "en_core_web_lg"
 
-        nlp = self.nlp_model_loader.get_model(nlp_model)
-        return nlp
+        nlp_model = self.nlp_model_loader.get_model(nlp_model_name)
+        return nlp_model
 
-    def extract_keywords(self, text):
+    def extract_keywords(self, text, nlp):
         """Function to extract keywords from a text."""
         doc = self.nlp(text)
         keywords = []
@@ -39,7 +36,7 @@ class InterestGenerator:
 
         return keywords
 
-    def match_interests_with_status(self, interests):
+    def match_interests_with_status(self, interests, nlp_model):
         """
         Function to match interests with text.
         Params: interests: List of interests from database.
@@ -48,14 +45,14 @@ class InterestGenerator:
         persisted_relations = []
         status_text = self.status["preprocessed_content"]
         status_id = self.status["id"]
-        keywords = self.extract_keywords(status_text)
+        keywords = self.extract_keywords(status_text, nlp_model)
         matches = []
 
         start_time = time.time()
         max_duration = 29  # Setze die maximale Dauer auf 50 Sekunden
 
-        for keyword_doc in self.nlp.pipe(keywords):
-            for interest_doc, interest_id in self.nlp.pipe(interests, as_tuples=True):
+        for keyword_doc in nlp_model.pipe(keywords):
+            for interest_doc, interest_id in nlp_model.pipe(interests, as_tuples=True):
                 # Überprüfe, ob die maximale Dauer überschritten wurde
                 if time.time() - start_time > max_duration:
                     break
@@ -80,26 +77,26 @@ class InterestGenerator:
 
         return top_3_matches
 
-    def generate_interests(self):
+    def generate_interests(self, status_id):
         """Function to generate interests for a status."""
         try:
-            self.status = get_status_by_id(self.status_id)
+            status = get_status_by_id(status_id)
             interests = get_all_interests_with_name_and_id()
         except IndexError:
             abort(404)
 
         with open("log_interests_modelling.txt", "a") as f:
-            print("Triggered interest modelling for status:", self.status["id"], file=f)
+            print("Triggered interest modelling for status:", status["id"], file=f)
 
         start = time.time()
 
         # initialize text preprocessor
-        self.nlp = self.choose_nlp_model(self.status)
-        text_preprocessor = TextPreprocessor(self.nlp)
-        self.status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(self.status["text"])
+        nlp_model = self.choose_nlp_model(status)
+        text_preprocessor = TextPreprocessor(nlp_model)
+        self.status["preprocessed_content"] = text_preprocessor.sentence_preprocessing(status["text"])
 
         # extract keywords from text
-        matches = self.match_interests_with_status(interests)
+        matches = self.match_interests_with_status(interests, nlp_model)
 
         end = time.time()
         diff = end - start
@@ -110,11 +107,11 @@ class InterestGenerator:
                 "Zeitaufwand:",
                 diff,
                 "/ NLP Modell:",
-                self.nlp.meta["lang"] + "_" + self.nlp.meta["name"],
+                nlp_model.meta["lang"] + "_" + nlp_model.meta["name"],
                 "/ Status:",
-                self.status["text"],
+                status["text"],
                 "/ Preprocessed Text:",
-                self.status["preprocessed_content"],
+                status["preprocessed_content"],
                 "/ Matches:",
                 matches,
                 file=f,

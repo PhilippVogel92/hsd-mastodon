@@ -1,4 +1,4 @@
-class AllocateTagsJob < ApplicationJob
+class AllocateInterestsJob < ApplicationJob
   queue_as :default
 
   def perform(status_id)

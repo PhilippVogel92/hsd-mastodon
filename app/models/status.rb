@@ -542,6 +542,6 @@ class Status < ApplicationRecord
   end
 
   def allocate_interests
-    AllocateTagsJob.perform_later self.id
+    AllocateInterestsJob.perform_later self.id
   end
 end

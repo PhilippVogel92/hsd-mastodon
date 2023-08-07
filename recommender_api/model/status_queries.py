@@ -87,22 +87,26 @@ def get_status_with_interest_ids_and_stats_by_status_id(status_id):
     param status_id: The id of the status.
     return: A specific status by id with joined interest_id as list.
     """
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT statuses.*, array_agg(interests_statuses.interest_id) AS interest_ids, status_stats.replies_count, status_stats.reblogs_count, status_stats.favourites_count FROM statuses LEFT JOIN interests_statuses ON statuses.id = interests_statuses.status_id LEFT JOIN status_stats ON statuses.id = status_stats.status_id WHERE statuses.id = %s GROUP BY statuses.id, status_stats.reblogs_count, status_stats.favourites_count, status_stats.replies_count;",
-        (status_id,),
-    )
-    response = cur.fetchone()
+    query = """
+        SELECT statuses.*, array_agg(interests_statuses.interest_id) AS interest_ids, 
+               status_stats.replies_count, status_stats.reblogs_count, status_stats.favourites_count 
+        FROM statuses 
+        LEFT JOIN interests_statuses ON statuses.id = interests_statuses.status_id 
+        LEFT JOIN status_stats ON statuses.id = status_stats.status_id 
+        WHERE statuses.id = %s 
+        GROUP BY statuses.id, status_stats.reblogs_count, status_stats.favourites_count, status_stats.replies_count;
+    """
+    with conn.cursor() as cur:
+        cur.execute(query, (status_id,))
+        response = cur.fetchone()
 
-    # Get the column names
-    column_names = [desc[0] for desc in cur.description]
+        if response is None:
+            return None
 
-    # Convert the result to a dictionary
-    status = dict(zip(column_names, response))
+        column_names = [desc[0] for desc in cur.description]
+        status = dict(zip(column_names, response))
 
-    cur.close()
     return status
-
 
 def get_status_stats_by_status_id(status_id):
     """

@@ -1,11 +1,12 @@
+from recommender_api.model.account_queries import get_followed_accounts, get_blocked_accounts, get_muted_accounts
+from recommender_api.model.interest_queries import get_interests_by_account_id
 from recommender_api.model.status_queries import (
     get_status_with_interest_ids_and_stats_by_status_id,
 )
-from recommender_api.model.interest_queries import get_interests_by_account_id
-from recommender_api.model.account_queries import get_followed_accounts, get_blocked_accounts, get_muted_accounts
+from .ranking_calculator import RankingCalculator
 from .status_filter import StatusFilter
 from .status_sorter import StatusSorter
-from .ranking_calculator import RankingCalculator
+
 
 class RankingSystem:
     """
@@ -39,15 +40,17 @@ class RankingSystem:
         return self.status_sorter.sort_statuses_by_ranking_score(statuses)
 
     def sort_timeline(self, account_id, status_ids):
-        """Function to sort the timeline of a account by ranking score.
+        """Function to sort the timeline of an account by ranking score.
         param account_id: The id of the account. The statuses will be sorted by the interests of the account.
         param status_ids: The ids of the statuses.
         return: A list of sorted status ids by ranking score.
         """
-        
-        statuses_with_interest_ids_and_stats = [
-            get_status_with_interest_ids_and_stats_by_status_id(status_id) for status_id in status_ids
-        ]
+
+        statuses_with_interest_ids_and_stats = []
+        for status_id in status_ids:
+            status = get_status_with_interest_ids_and_stats_by_status_id(status_id)
+            if status is not None:
+                statuses_with_interest_ids_and_stats.append(status)
 
         interest_ids_from_account = get_interests_by_account_id(account_id)
         following_list = get_followed_accounts(account_id)

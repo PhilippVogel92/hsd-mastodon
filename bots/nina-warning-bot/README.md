@@ -22,3 +22,5 @@ You can run the script with the following command: `python nina_bot.py`
 
 This script is intended to run periodically, e.g. through a cronjob. 
 
+The blacklist file can be cleaned up using the `nina_bot_cleanup.py` script. This removes all warnings from the blacklist file except for those that are active and have already been posted. It is also intended to be run periodically, e.g. every thirty days through a cronjob.
+

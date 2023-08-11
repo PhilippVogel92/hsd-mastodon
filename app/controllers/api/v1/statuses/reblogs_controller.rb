@@ -2,6 +2,8 @@
 
 class Api::V1::Statuses::ReblogsController < Api::BaseController
   include Authorization
+  include Redisable
+  include Lockable
 
   before_action -> { doorkeeper_authorize! :write, :'write:statuses' }
   before_action :require_user!
@@ -10,8 +12,11 @@ class Api::V1::Statuses::ReblogsController < Api::BaseController
   override_rate_limit_headers :create, family: :statuses
 
   def create
-    @status = ReblogService.new.call(current_account, @reblog, reblog_params)
+    with_lock("reblog:#{current_account.id}:#{@reblog.id}") do
+      @status = ReblogService.new.call(current_account, @reblog, reblog_params)
+    end
 
+    del_key_recommender(current_account.id)
     render json: @status, serializer: REST::StatusSerializer
   end
 
@@ -28,6 +33,7 @@ class Api::V1::Statuses::ReblogsController < Api::BaseController
       authorize @reblog, :show?
     end
 
+    del_key_recommender(current_account.id)
     render json: @reblog, serializer: REST::StatusSerializer, relationships: StatusRelationshipsPresenter.new([@status], current_account.id, reblogs_map: { @reblog.id => false })
   rescue Mastodon::NotPermittedError
     not_found

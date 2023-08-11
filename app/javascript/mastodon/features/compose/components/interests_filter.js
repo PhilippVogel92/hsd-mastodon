@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import Icon from 'mastodon/components/icon';
-import InterestsFilterHashtag from './interests_filter_hashtag';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import Interest from "./interest";
 
 const messages = defineMessages({
   placeholder: { id: 'interests_selection.search', defaultMessage: 'Search for tags' },
@@ -25,28 +25,28 @@ class InterestsFilter extends React.PureComponent {
     onClear: PropTypes.func.isRequired,
     followInterest: PropTypes.func.isRequired,
     unfollowInterest: PropTypes.func.isRequired,
-    getFollowedTags: PropTypes.func.isRequired,
-    searchTags: PropTypes.func.isRequired,
+    getFollowedInterests: PropTypes.func.isRequired,
+    searchInterests: PropTypes.func.isRequired,
     openInRoute: PropTypes.bool,
     intl: PropTypes.object.isRequired,
     singleColumn: PropTypes.bool,
     results: ImmutablePropTypes.map.isRequired,
-    initFollowedTags: ImmutablePropTypes.list.isRequired,
+    initFollowedInterests: ImmutablePropTypes.list.isRequired,
   };
 
   state = {
     expanded: false,
-    followedTags: this.props.initFollowedTags,
+    followedInterests: this.props.initFollowedInterests,
   };
 
   componentDidMount() {
-    this.props.getFollowedTags();
+    this.props.getFollowedInterests();
   }
 
   componentDidUpdate(prevProps) {
     // Check if it's a new user, you can also use some unique property, like the ID  (this.props.user.id !== prevProps.user.id)
-    if (this.props.initFollowedTags !== prevProps.initFollowedTags) {
-      this.setState({ followedTags: this.props.initFollowedTags });
+    if (this.props.initFollowedInterests !== prevProps.initFollowedInterests) {
+      this.setState({ followedInterests: this.props.initFollowedInterests });
     }
   }
 
@@ -63,37 +63,37 @@ class InterestsFilter extends React.PureComponent {
     let timer;
     return () => {
       clearTimeout(timer);
-      timer = setTimeout(() => this.props.searchTags(), 250);
+      timer = setTimeout(() => this.props.searchInterests(), 250);
     };
   };
 
   debounceSearch = this.debounce();
 
-  handleFollowInterest = (hashtag) => {
-    this.props.followInterest(hashtag.get('name'));
+  handleFollowInterest = (interest) => {
+    this.props.followInterest(interest.get('name'));
     this.setState(state => ({
-      followedTags: state.followedTags.push(hashtag),
+      followedInterests: state.followedInterests.push(interest),
     }));
   };
 
-  handleUnfollowInterest = (hashtag) => {
-    this.props.unfollowInterest(hashtag.get('name'));
+  handleUnfollowInterest = (interest) => {
+    this.props.unfollowInterest(interest.get('name'));
     this.setState(state => ({
-      followedTags: state.followedTags.filter(followed => followed !== hashtag),
+      followedInterests: state.followedInterests.filter(followed => followed !== interest),
     }));
   };
 
   handleFollowInterestSubmit = () => {
-    let tagAlreadyFollowed = this.state.followedTags.filter(hashtag => hashtag.get('name') === this.props.value).size > 0;
-    if (tagAlreadyFollowed === true) return;
+    let interestAlreadyFollowed = this.state.followedInterests.filter(interest => interest.get('name') === this.props.value).size > 0;
+    if (interestAlreadyFollowed === true) return;
     this.props.followInterest(this.props.value);
-    if (this.props.results.get('hashtags')?.size === 0) {
+    if (this.props.results.get('interests')?.size === 0) {
       this.props.onChange('');
     }
-    let newTag = new Map();
-    newTag.set('name', this.props.value);
+    let newInterest = new Map();
+    newInterest.set('name', this.props.value);
     this.setState((state) => ({
-      followedTags: state.followedTags.push(newTag),
+      followedInterests: state.followedInterests.push(newInterest),
     }));
   };
 
@@ -132,10 +132,9 @@ class InterestsFilter extends React.PureComponent {
 
   render() {
     const { intl, value, submitted, results } = this.props;
-    const { followedTags } = this.state;
+    const { followedInterests } = this.state;
     const hasValue = value.length > 0 || submitted;
-    const notFollowedTags = results.get('hashtags')?.filter(hashtag => followedTags.filter(followed => followed.get('name') === hashtag.get('name')).size === 0);
-
+    const notFollowedInterests = results.get('interests')?.filter(interest => followedInterests.filter(followed => followed.get('name') === interest.get('name')).size === 0);
     return (
       <div className='interests-filter'>
         <input
@@ -165,41 +164,43 @@ class InterestsFilter extends React.PureComponent {
           />
         </div>
 
-        {results.get('hashtags') !== undefined &&
-          results.get('hashtags').size === 0 &&
+        {results.get('interests') !== undefined &&
+          results.get('interests').size === 0 &&
           value !== '' ? (
-            <div className='new-hashtag'>
-              <p><FormattedMessage id='interests_selection.search.empty' values={{ hashtag: value }} defaultMessage='The hashtag {hashtag} does not yet exist' /> </p>
-              <button className='button' onClick={this.handleFollowInterestSubmit}><FormattedMessage id='interests_selection.create_hashtag' defaultMessage='Create hashtag' /></button>
+            <div className='new-interest'>
+              <p><FormattedMessage id='interests_selection.search.empty' values={{ interest: value }} defaultMessage='The interest {interest} does not yet exist' /> </p>
+              <button className='button' onClick={this.handleFollowInterestSubmit}><FormattedMessage id='interests_selection.create_interest' defaultMessage='Create interest' /></button>
             </div>
-          ) : !notFollowedTags?.size ? null : (
+          ) : !notFollowedInterests?.size ? null : (
             <div className='search-results__section'>
-              {notFollowedTags.map(hashtag => (
-                <InterestsFilterHashtag
-                  hashtag={hashtag}
-                  isFollowingHashtagsList={false}
+              {notFollowedInterests.map(interest => (
+                <Interest
+                  interest={interest}
+                  isFollowingInterestsList={false}
                   onClick={this.handleFollowInterest}
-                  key={hashtag.get('name')}
+                  key={interest.get('name')}
                 />
               ))}
             </div>
           )}
 
-        <h3><FormattedMessage id='interests_selection.followed_hashtags.title' defaultMessage='Your followed hashtags' /></h3>
-        {followedTags.size === 0 ? (
-          <p><FormattedMessage id='interests_selection.followed_hashtags.empty' defaultMessage='You dont follow any hashtags' /></p>
-        ) : (
-          <div className='search-results__section'>
-            {followedTags.map(hashtag => (
-              <InterestsFilterHashtag
-                hashtag={hashtag}
-                isFollowingHashtagsList
-                onClick={this.handleUnfollowInterest}
-                key={hashtag.get('name')}
-              />
-            ))}
-          </div>
-        )}
+        <div className='followed-hashtags'>
+          <h4><FormattedMessage id='interests_selection.followed_interests.title' defaultMessage='Your followed interests' /></h4>
+          {followedInterests.size === 0 ? (
+            <p><FormattedMessage id='interests_selection.followed_interests.empty' defaultMessage='You dont follow any interests' /></p>
+          ) : (
+            <div className='search-results__section'>
+              {followedInterests.map(interest => (
+                <Interest
+                  interest={interest}
+                  isFollowingInterestsList
+                  onClick={this.handleUnfollowInterest}
+                  key={interest.get('name')}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     );
   }

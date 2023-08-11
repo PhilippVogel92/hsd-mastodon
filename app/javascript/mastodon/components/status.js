@@ -524,7 +524,6 @@ class Status extends ImmutablePureComponent {
                 <DisplayName account={status.get('account')} />
               </a>
             </div>
-
             <StatusContent
               status={status}
               onClick={this.handleClick}

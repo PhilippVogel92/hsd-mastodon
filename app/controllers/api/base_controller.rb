@@ -6,6 +6,7 @@ class Api::BaseController < ApplicationController
 
   include RateLimitHeaders
   include AccessTokenTrackingConcern
+  include Redisable
 
   skip_before_action :store_current_location
   skip_before_action :require_functional!, unless: :whitelist_mode?
@@ -78,6 +79,14 @@ class Api::BaseController < ApplicationController
   end
 
   rescue_from ActionController::ParameterMissing, Mastodon::InvalidParameterError do |e|
+    render json: { error: e.to_s }, status: 400
+  end
+
+  rescue_from Mastodon::RecommenderConnectionRefusedError do |e|
+    render json: { error: e.to_s }, status: 500
+  end
+
+  rescue_from Mastodon::RecommenderResponseError do |e|
     render json: { error: e.to_s }, status: 400
   end
 
@@ -160,5 +169,9 @@ class Api::BaseController < ApplicationController
 
   def respond_with_error(code)
     render json: { error: Rack::Utils::HTTP_STATUS_CODES[code] }, status: code
+  end
+
+  def del_key_recommender(account_id)
+    redis.del("feed:home:#{account_id}:recommender")
   end
 end

@@ -1387,6 +1387,7 @@ en:
       expired: The poll has already ended
       invalid_choice: The chosen vote option does not exist
       over_character_limit: cannot be longer than %{max} characters each
+      self_vote: You cannot vote in your own polls
       too_few_options: must have more than one item
       too_many_options: can't contain more than %{max} items
   preferences:
@@ -1705,3 +1706,7 @@ en:
     not_supported: This browser doesn't support security keys
     otp_required: To use security keys please enable two-factor authentication first.
     registered_on: Registered on %{date}
+  recommender:
+    error:
+      connection_refused: The Recommender is currently not available
+      recommender_response: An error occurred in the Recommender

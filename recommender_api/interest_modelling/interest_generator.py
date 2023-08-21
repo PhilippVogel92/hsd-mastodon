@@ -49,11 +49,10 @@ class InterestGenerator:
         matches = []
 
         start_time = time.time()
-        max_duration = 29  # Setze die maximale Dauer auf 50 Sekunden
+        max_duration = 29
 
         for keyword_doc in nlp_model.pipe(keywords):
             for interest_doc, interest_id in nlp_model.pipe(interests, as_tuples=True):
-                # Überprüfe, ob die maximale Dauer überschritten wurde
                 if time.time() - start_time > max_duration:
                     break
                 similarity = keyword_doc.similarity(interest_doc)
@@ -85,11 +84,6 @@ class InterestGenerator:
         except IndexError:
             abort(404)
 
-        with open("log_interests_modelling.txt", "a") as f:
-            print("Triggered interest modelling for status:", status["id"], file=f)
-
-        start = time.time()
-
         # initialize text preprocessor
         nlp_model = self.choose_nlp_model(status)
         text_preprocessor = TextPreprocessor(nlp_model)
@@ -98,22 +92,4 @@ class InterestGenerator:
         # extract keywords from text
         matches = self.match_interests_with_status(interests, status, nlp_model)
 
-        end = time.time()
-        diff = end - start
-
-        # safe all print statements in a file
-        with open("log_interests_modelling.txt", "a") as f:
-            print(
-                "Zeitaufwand:",
-                diff,
-                "/ NLP Modell:",
-                nlp_model.meta["lang"] + "_" + nlp_model.meta["name"],
-                "/ Status:",
-                status["text"],
-                "/ Preprocessed Text:",
-                status["preprocessed_content"],
-                "/ Matches:",
-                matches,
-                file=f,
-            )
         return matches

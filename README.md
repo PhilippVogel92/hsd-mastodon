@@ -1,103 +1,106 @@
-<h1><picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./lib/assets/wordmark.dark.png?raw=true">
-  <source media="(prefers-color-scheme: light)" srcset="./lib/assets/wordmark.light.png?raw=true">
-  <img alt="Mastodon" src="./lib/assets/wordmark.light.png?raw=true" height="34">
-</picture></h1>
+# HSD Mastodon Recommender System
 
-[![GitHub release](https://img.shields.io/github/release/mastodon/mastodon.svg)][releases]
-[![Build Status](https://img.shields.io/circleci/project/github/mastodon/mastodon.svg)][circleci]
-[![Code Climate](https://img.shields.io/codeclimate/maintainability/mastodon/mastodon.svg)][code_climate]
-[![Crowdin](https://d322cqt584bo4o.cloudfront.net/mastodon/localized.svg)][crowdin]
+## Overview
+The HSD Mastodon Recommender System is an advanced feature implemented within the HSD Mastodon instance that aims to curate and personalize the Mastodon timeline for each user. By leveraging a sophisticated ranking algorithm, the system prioritizes posts that are more likely to be of interest to the user, thereby creating an engaging and relevant social media experience.
 
-[releases]: https://github.com/mastodon/mastodon/releases
-[circleci]: https://circleci.com/gh/mastodon/mastodon
-[code_climate]: https://codeclimate.com/github/mastodon/mastodon
-[crowdin]: https://crowdin.com/project/mastodon
+## Key Features
+- **Ranking System**: A comprehensive framework that calculates a score for each post to determine its relevance to the user's interests.
+- **Status Filtering**: Utilizes a score threshold to filter out less relevant posts and employs techniques to ensure a diverse range of authors is presented to the user.
+- **Status Sorting**: Organizes posts in descending order of relevance based on their calculated ranking scores to present the most pertinent content first.
+- **Interest Modeling**: Enables the adaptation of a user's timeline to their interests by associating relevant interests with each post.
+  
+## Detailed Description of Recommender System
+The Recommender System is the heartbeat of the HSD Mastodon instance's personalized timeline. It compiles a list of posts ranked according to user engagement, relevance to user's interests, relationships between the user and post authors, and the freshness of posts.
 
-Mastodon is a **free, open-source social network server** based on ActivityPub where users can follow friends and discover new ones. On Mastodon, users can publish anything they want: links, pictures, text, video. All Mastodon servers are interoperable as a federated network (users on one server can seamlessly communicate with users from another one, including non-Mastodon software that implements ActivityPub!)
+![Komponentensicht_lv1 drawio](https://github.com/PhilippVogel92/hsd-mastodon/assets/107690428/3a8014ea-925a-45ae-a32a-9be704bf6e8b)
 
-Click below to **learn more** in a video:
+The ranking system is built upon several key components:
 
-[![Screenshot](https://blog.joinmastodon.org/2018/06/why-activitypub-is-the-future/ezgif-2-60f1b00403.gif)][youtube_demo]
+### Ranking Calculator
+Handles the complex task of evaluating the relevance of posts within the home timeline. The system considers several elements:
 
-[youtube_demo]: https://www.youtube.com/watch?v=IPSbNdBmWKE
+- **Interaction Subscores**: Derived from different forms of post engagement, such as comments (replies), shares (reblogs), and likes (favourites). The subscore formula ensures that scores range between 0 and 1, increasing progressively with the number of engagements. Tunable parameters allow for adjusting sensitivity to engagement frequency, accommodating for the instance's activity level.
+- **Weighted Interaction Score**: A combined, weighted sum of all interaction subscores, where each type of interaction is assigned a distinct importance and the total does not exceed 1.
+- **Age Score**: Reflects the timeliness of a post, depreciating over time but never plummeting to zero. This score is also configurable to modulate its impact on the overall ranking.
+- **Follower & Interest Boost**: Additional scores are applied to promote content from followed users and topics aligned with the user's interests.
 
-## Navigation
+### Status Filtering
+Focused on enhancing the diversity of content shown to users, the status filter operates to:
 
-- [Project homepage 🐘](https://joinmastodon.org)
-- [Support the development via Patreon][patreon]
-- [View sponsors](https://joinmastodon.org/sponsors)
-- [Blog](https://blog.joinmastodon.org)
-- [Documentation](https://docs.joinmastodon.org)
-- [Official Docker image](https://github.com/mastodon/mastodon/pkgs/container/mastodon)
-- [Browse Mastodon servers](https://joinmastodon.org/communities)
-- [Browse Mastodon apps](https://joinmastodon.org/apps)
+- **Promote Author Diversity**: Limit the predominance of prolific authors by setting daily per-author post visibility limits, ensuring a breadth of perspectives within the user's feed.
+- **Threshold-Based Filtering**: Exclude posts scoring below a certain threshold, typically filtering out content from muted or blocked authors to accommodate user preferences and foster a positive environment.
+  
+![Komponentensicht_lv2_ranking drawio (1)](https://github.com/PhilippVogel92/hsd-mastodon/assets/107690428/df2b398c-5a6b-4a81-a149-3c1bdd3edc63)
 
-[patreon]: https://www.patreon.com/mastodon
+### Interest Modeling
 
-## Features
+The Interest Modeling in the Recommender System plays a pivotal role in personalizing the user experience by associating relevant interests with statuses posted within the Mastodon network.
 
-<img src="/app/javascript/images/elephant_ui_working.svg?raw=true" align="right" width="30%" />
+#### Data Foundation for Interest Assignment
 
-### No vendor lock-in: Fully interoperable with any conforming platform
+The `InterestGenerator` class requires only the status ID and utilizes this information to fetch necessary data from the Mastodon database. This data foundation ensures that the size of the request body originating from the Mastodon instance is kept minimal.
 
-It doesn't have to be Mastodon; whatever implements ActivityPub is part of the social network! [Learn more](https://blog.joinmastodon.org/2018/06/why-activitypub-is-the-future/)
+#### Dynamic Model Selection for Each Status
 
-### Real-time, chronological timeline updates
+For keyword extraction and interest assignment, various Natural Language Processing (NLP) models, supported by SpaCy, are employed based on the language of the status. The class `InterestGenerator` includes the `choose_nlp_model` method selecting suitable NLP models for analyzing text based on its detected language, using the `langdetect` library. This dynamic selection ensures high precision in keyword extraction.
 
-Updates of people you're following appear in real-time in the UI via WebSockets. There's a firehose view as well!
+#### Keyword Extraction and Text Preprocessing
+The TextPreprocessor class is responsible for preparing the status text by removing HTML tags, URLs, and stop words, while also converting words to their base or lemma form. This preprocessing streamlines the text and improves the accuracy of keyword extraction by removing unnecessary information.
 
-### Media attachments like images and short videos
+#### Interest Analysis and Assignment based on Keywords
+The InterestGenerator class performs interest analysis and assignment by comparing the extracted and preprocessed keywords with existing interests in the Mastodon database. Both keywords and interests are transformed into word vectors using the selected NLP model. Similarity between the vectors is then calculated using cosine similarity. Matches above a predefined threshold are considered relevant and are used to recommend interests to the status. The three highest-scoring interests are assigned to the status, enhancing personalization.
 
-Upload and view images and WebM/MP4 videos attached to the updates. Videos with no audio track are treated like GIFs; normal videos loop continuously!
+![Komponentensicht_lv2_interest drawio (1)](https://github.com/PhilippVogel92/hsd-mastodon/assets/107690428/91af78bb-2c4f-488e-93fa-9bd09d7e173a)
 
-### Safety and moderation tools
+### Recommender API Endpoints
 
-Mastodon includes private posts, locked accounts, phrase filtering, muting, blocking and all sorts of other features, along with a reporting and moderation system. [Learn more](https://blog.joinmastodon.org/2018/07/cage-the-mastodon/)
+The Recommender's routing is realized through the Flask micro-framework, enabling the processing of Mastodon instance requests and invocation of the corresponding controller functions. Our Flask-Blueprint class outlines the endpoints responsible for generating a sorted timeline and determining interests for posts, as highlighted below:
 
-### OAuth2 and a straightforward REST API
+| Method  | Path                                         | Description                                              |
+|---------|----------------------------------------------|----------------------------------------------------------|
+| POST    | /accounts/<account_id>/create-sorted-timeline | Returns a sorted list of status IDs based on the recommendation algorithm.|
+| GET     | /statuses/<status_id>/generate-interests      | Returns interests associated with a status.              |
 
-Mastodon acts as an OAuth2 provider, so 3rd party apps can use the REST and Streaming APIs. This results in a rich app ecosystem with a lot of choices!
 
-## Deployment
+### Integration with Mastodon's Ruby on Rails and React Applications
 
-### Tech stack:
+The recommender system seamlessly integrates with both the Ruby on Rails and React parts of the Mastodon project. All modifications are currently exclusive to the HSD instance but have been developed with the potential future inclusion into the open-source project in mind.
 
-- **Ruby on Rails** powers the REST API and other web pages
-- **React.js** and Redux are used for the dynamic parts of the interface
-- **Node.js** powers the streaming API
+## Getting Started
 
-### Requirements:
+To set up and run the recommender system on your Mastodon instance, ensure you have the following prerequisites:
+- Ruby version
+- Rails version
+- Mastodon version
+- Flask micro-framework for Python
 
-- **PostgreSQL** 9.5+
-- **Redis** 4+
-- **Ruby** 2.7+
-- **Node.js** 14+
+Follow the instructions to integrate the recommender system and foster a more engaging and personalized social experience for your users.
 
-The repository includes deployment configurations for **Docker and docker-compose** as well as specific platforms like **Heroku**, **Scalingo**, and **Nanobox**. For Helm charts, reference the [mastodon/chart repository](https://github.com/mastodon/chart). The [**standalone** installation guide](https://docs.joinmastodon.org/admin/install/) is available in the documentation.
+### Installation
 
-A **Vagrant** configuration is included for development purposes. To use it, complete following steps:
+1. Clone the repository to your local machine.
+2. Install the required dependencies for Ruby on Rails and Flask.
+3. Run database migrations if necessary.
+4. Start the Rails server.
+5. Set up the Flask application to handle recommendation API endpoints.
 
-- Install Vagrant and Virtualbox
-- Install the `vagrant-hostsupdater` plugin: `vagrant plugin install vagrant-hostsupdater`
-- Run `vagrant up`
-- Run `vagrant ssh -c "cd /vagrant && foreman start"`
-- Open `http://mastodon.local` in your browser
+### Usage
 
-## Contributing
+After successful integration, use the Mastodon UI to interact with the recommender system. Users can benefit from options that allow toggling between the original chronological feed and the new recommender feed, thus controlling the display of recommended posts.
 
-Mastodon is **free, open-source software** licensed under **AGPLv3**.
-
-You can open issues for bugs you've found or features you think are missing. You can also submit pull requests to this repository or submit translations using Crowdin. To get started, take a look at [CONTRIBUTING.md](CONTRIBUTING.md). If your contributions are accepted into Mastodon, you can request to be paid through [our OpenCollective](https://opencollective.com/mastodon).
-
-**IRC channel**: #mastodon on irc.libera.chat
 
 ## License
 
-Copyright (C) 2016-2022 Eugen Rochko & other Mastodon contributors (see [AUTHORS.md](AUTHORS.md))
+This recommender system is distributed under the [LICENSE.md](LICENSE.md) included with the project. It stipulates the terms under which the software may be used, modified, and distributed.
 
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+## Authors
+- Philipp Vogel (Recommender Architecture, Interest Modeling, Status Filtering/Sorting, API Endpoints)
+- Kevin Zielke (Ranking Calculator)
+- Nils Remigius (Recommender API Binding, Redis/Mastodon Integration)
+- Ben Kräling (Recommender API Binding, Interest Modeling, Frontend Mastodon Recommender Feed)
+- Simon Ludwig, Valeriia Muzhevska, Eric Oelsen (Bots)
+- Dario Varivoda (Server Backup, Hosting, CI/CD)
+ 
+## Acknowledgments
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+The authors extend their gratitude to the HSD community, Mastodon open-source contributors, and all who have provided feedback and support throughout the development of this recommender system.
